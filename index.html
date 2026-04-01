@@ -4,108 +4,194 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XIM Power System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #F5F7FA;
             min-height: 100vh;
         }
+        
         .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: #043C7C;
+            padding: 32px 48px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
             color: white;
-            padding: 20px 30px;
-            text-align: center;
+            letter-spacing: -0.3px;
         }
-        .header h1 { font-size: 28px; }
-        .header p { opacity: 0.8; font-size: 14px; margin-top: 5px; }
-        .tabs {
-            display: flex;
+        
+        .header p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-top: 8px;
+            font-weight: 400;
+        }
+        
+        .nav-container {
             background: white;
-            justify-content: center;
-            gap: 5px;
-            padding: 0 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            flex-wrap: wrap;
+            border-bottom: 1px solid #E9ECEF;
+            padding: 0 48px;
         }
-        .tab-btn {
-            padding: 15px 30px;
+        
+        .nav-tabs {
+            display: flex;
+            gap: 0;
+            list-style: none;
+        }
+        
+        .nav-tab {
+            padding: 18px 28px;
             background: none;
             border: none;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
-            color: #666;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
+            color: #6C757D;
+            transition: all 0.2s ease;
+            position: relative;
+            font-family: 'Inter', sans-serif;
         }
-        .tab-btn:hover { color: #f4a261; }
-        .tab-btn.active {
-            color: #f4a261;
-            border-bottom-color: #f4a261;
+        
+        .nav-tab:hover {
+            color: #E6163E;
         }
-        .container {
-            padding: 20px;
-            min-height: 500px;
+        
+        .nav-tab.active {
+            color: #E6163E;
         }
-        .module-pane { display: none; }
-        .module-pane.active { display: block; }
-        iframe {
+        
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #E6163E;
+        }
+        
+        .main-container {
+            padding: 32px 48px;
+            min-height: calc(100vh - 140px);
+        }
+        
+        .module-pane {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .module-pane.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .module-frame {
             width: 100%;
-            height: calc(100vh - 200px);
+            height: calc(100vh - 220px);
             border: none;
-            border-radius: 12px;
+            border-radius: 16px;
             background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.2s ease;
         }
-        footer {
-            background: #1e3c72;
-            color: white;
+        
+        .module-frame:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+        
+        .footer {
+            background: #F8F9FA;
+            border-top: 1px solid #E9ECEF;
+            padding: 20px 48px;
             text-align: center;
-            padding: 12px;
-            font-size: 12px;
         }
+        
+        .footer p {
+            font-size: 12px;
+            color: #868E96;
+            letter-spacing: 0.3px;
+        }
+        
         @media (max-width: 768px) {
-            .tab-btn { padding: 10px 15px; font-size: 12px; }
-            iframe { height: calc(100vh - 250px); }
+            .header {
+                padding: 24px 24px;
+            }
+            .header h1 {
+                font-size: 22px;
+            }
+            .nav-container {
+                padding: 0 16px;
+                overflow-x: auto;
+            }
+            .nav-tab {
+                padding: 14px 20px;
+                font-size: 14px;
+                white-space: nowrap;
+            }
+            .main-container {
+                padding: 24px 16px;
+            }
+            .module-frame {
+                height: calc(100vh - 180px);
+            }
+            .footer {
+                padding: 16px 24px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>⚡ XIM POWER SYSTEM</h1>
-        <p>Solución Integral para Logística, Fichas Técnicas y Data Center</p>
+        <h1>XIM POWER SYSTEM</h1>
+        <p>Solución integral para logística, fichas técnicas e infraestructura</p>
     </div>
-
-    <div class="tabs">
-        <button class="tab-btn active" onclick="showModule('fichas')">📄 Fichas Técnicas con IA</button>
-        <button class="tab-btn" onclick="showModule('contenedores')">📦 Calculadora de Contenedores 3D</button>
-        <button class="tab-btn" onclick="showModule('datacenter')">🏢 Data Center / UPS</button>
+    
+    <div class="nav-container">
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showModule('fichas')">Fichas Técnicas</button>
+            <button class="nav-tab" onclick="showModule('contenedores')">Calculadora de Contenedores</button>
+            <button class="nav-tab" onclick="showModule('datacenter')">Data Center & UPS</button>
+        </div>
     </div>
-
-    <div class="container">
+    
+    <div class="main-container">
         <div id="module-fichas" class="module-pane active">
-            <iframe src="modules/module-fichas/index.html"></iframe>
+            <iframe class="module-frame" src="modules/module-fichas/index.html"></iframe>
         </div>
         <div id="module-contenedores" class="module-pane">
-            <iframe src="modules/module-contenedores/index.html"></iframe>
+            <iframe class="module-frame" src="modules/module-contenedores/index.html"></iframe>
         </div>
         <div id="module-datacenter" class="module-pane">
-            <iframe src="modules/module-datacenter/index.html"></iframe>
+            <iframe class="module-frame" src="modules/module-datacenter/index.html"></iframe>
         </div>
     </div>
-
-    <footer>
-        <p>XIM POWER - Soluciones en Logística, Energía y Tecnología</p>
-    </footer>
-
+    
+    <div class="footer">
+        <p>XIM POWER — Soluciones tecnológicas para logística y energía</p>
+    </div>
+    
     <script>
         function showModule(moduleName) {
             document.querySelectorAll('.module-pane').forEach(function(pane) {
                 pane.classList.remove('active');
             });
             document.getElementById('module-' + moduleName).classList.add('active');
-            document.querySelectorAll('.tab-btn').forEach(function(btn) {
+            document.querySelectorAll('.nav-tab').forEach(function(btn) {
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
