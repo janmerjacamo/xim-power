@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XIM - Fichas Técnicas con IA</title>
+    <link rel="stylesheet" href="./styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="xim-fichas-container">
+        <div class="module-header">
+            <div class="header-icon">📄</div>
+            <div>
+                <h1>Fichas Técnicas con IA</h1>
+                <p>Extrae texto, detecta tablas y traduce con Gemini</p>
+            </div>
+        </div>
+
+        <div class="fichas-grid">
+            <div class="panel-left">
+                <div class="card">
+                    <div class="card-title">
+                        <span>🤖</span>
+                        <h3>Configuración IA</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="api-config">
+                            <label>API Key de Google Gemini</label>
+                            <input type="password" id="apiKey" placeholder="Ingresa tu API Key" class="api-input">
+                            <button id="testApiBtn" class="btn-secondary">🔌 Probar conexión</button>
+                            <div id="apiStatus" class="status-badge status-offline">
+                                <span>⚪</span> No conectado
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <span>📁</span>
+                        <h3>Cargar Documento</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-icon">📄</div>
+                            <p>Arrastra o haz clic para seleccionar un PDF</p>
+                            <input type="file" id="pdfFile" accept=".pdf" hidden>
+                            <button id="uploadBtn" class="btn-primary">Seleccionar archivo</button>
+                        </div>
+                        <div id="fileInfo" class="file-info" style="display: none;">
+                            <div class="file-detail">
+                                <span>📄</span>
+                                <span id="fileName"></span>
+                                <span id="pageCount" class="badge"></span>
+                            </div>
+                            <button id="extractBtn" class="btn-success">🔍 Extraer y analizar</button>
+                        </div>
+                        <div id="progressContainer" class="progress-container" style="display: none;">
+                            <div class="progress-bar" id="progressBar"></div>
+                            <p id="progressText" class="progress-text"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <span>📊</span>
+                        <h3>Estadísticas</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="statPages">0</div>
+                                <div class="stat-label">Páginas</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="statChars">0</div>
+                                <div class="stat-label">Caracteres</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="statTables">0</div>
+                                <div class="stat-label">Tablas</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-right">
+                <div class="tabs-container">
+                    <button class="tab-btn active" data-tab="text">📝 Texto Extraído</button>
+                    <button class="tab-btn" data-tab="tables">📊 Tablas Detectadas</button>
+                    <button class="tab-btn" data-tab="translate">🌐 Traducción</button>
+                </div>
+
+                <div id="tab-text" class="tab-content active">
+                    <div class="card">
+                        <div class="card-title">
+                            <span>📝</span>
+                            <h3>Texto Extraído</h3>
+                            <div class="card-actions">
+                                <button id="copyTextBtn" class="btn-icon" title="Copiar">📋</button>
+                                <button id="clearTextBtn" class="btn-icon" title="Limpiar">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <textarea id="extractedText" class="text-area" rows="15" placeholder="El texto extraído aparecerá aquí..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-tables" class="tab-content">
+                    <div class="card">
+                        <div class="card-title">
+                            <span>📊</span>
+                            <h3>Tablas Detectadas</h3>
+                            <button id="copyAllTablesBtn" class="btn-icon">📋 Copiar todas</button>
+                        </div>
+                        <div class="card-body" id="tablesContainer">
+                            <div class="empty-state">
+                                <span>📭</span>
+                                <p>No hay tablas detectadas aún</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-translate" class="tab-content">
+                    <div class="card">
+                        <div class="card-title">
+                            <span>🌐</span>
+                            <h3>Traducción al Español</h3>
+                            <div class="card-actions">
+                                <button id="translateBtn" class="btn-primary">🔄 Traducir con IA</button>
+                                <button id="copyTranslationBtn" class="btn-icon">📋</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <textarea id="translatedText" class="text-area" rows="15" placeholder="La traducción aparecerá aquí..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="module-footer">
+            <p>💡 <strong>Consejo:</strong> La IA detecta automáticamente tablas técnicas. Usa el botón "Traducir" para obtener el texto en español técnico.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.min.js"></script>
+    <script src="./script.js"></script>
+</body>
+</html>

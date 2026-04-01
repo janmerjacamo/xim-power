@@ -1,0 +1,372 @@
+ls -la /workspaces/xim-power/index.html* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+    background: #f0f2f5;
+    padding: 20px;
+}
+
+.xim-fichas-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.module-header {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    padding: 20px 25px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-icon {
+    font-size: 48px;
+}
+
+.module-header h1 {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.module-header p {
+    opacity: 0.8;
+    font-size: 14px;
+}
+
+.fichas-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-bottom: 2px solid #f4a261;
+}
+
+.card-title span {
+    font-size: 20px;
+}
+
+.card-title h3 {
+    flex: 1;
+    font-size: 16px;
+    color: #1e3c72;
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.btn-primary, .btn-secondary, .btn-success, .btn-icon {
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-primary {
+    background: #f4a261;
+    color: white;
+    padding: 10px 20px;
+}
+
+.btn-primary:hover {
+    background: #e76f51;
+}
+
+.btn-secondary {
+    background: #1e3c72;
+    color: white;
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+.btn-secondary:hover {
+    background: #2a5298;
+}
+
+.btn-success {
+    background: #70b62c;
+    color: white;
+    padding: 10px 20px;
+    width: 100%;
+}
+
+.btn-success:hover {
+    background: #5c9e1f;
+}
+
+.btn-icon {
+    background: #e9ecef;
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+.btn-icon:hover {
+    background: #dee2e6;
+}
+
+.api-config {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.api-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-online {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-offline {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.upload-area {
+    border: 2px dashed #ddd;
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.upload-area:hover {
+    border-color: #f4a261;
+    background: #fef5e8;
+}
+
+.upload-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.upload-area p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.file-info {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 15px;
+}
+
+.file-detail {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 8px;
+    background: white;
+    border-radius: 8px;
+}
+
+.badge {
+    background: #f4a261;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+}
+
+.progress-container {
+    margin-top: 15px;
+}
+
+.progress-bar {
+    height: 8px;
+    background: linear-gradient(90deg, #f4a261, #e76f51);
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #f4a261;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: #666;
+}
+
+.tabs-container {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 20px;
+    background: white;
+    border-radius: 12px;
+    padding: 5px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: #666;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    background: #f4a261;
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.text-area {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+#tablesContainer {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.table-item {
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: #e9ecef;
+}
+
+.table-content {
+    padding: 15px;
+    overflow-x: auto;
+}
+
+.table-content pre {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: pre-wrap;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+}
+
+.empty-state span {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.module-footer {
+    margin-top: 20px;
+    padding: 12px 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .fichas-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .module-header {
+        flex-direction: column;
+        text-align: center;
+    }
+}

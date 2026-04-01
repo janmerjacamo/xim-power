@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Container 3D XIM Calculator</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card h3 { color: #1e3c72; margin-bottom: 15px; border-left: 4px solid #f4a261; padding-left: 12px; }
+        .flex { display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; }
+        .form-group { flex: 1; min-width: 150px; }
+        label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        button { background: #f4a261; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        button:hover { background: #e76f51; }
+        .btn-primary { background: #1e3c72; }
+        .btn-success { background: #70b62c; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #e0e0e0; padding: 8px 12px; text-align: center; font-size: 13px; }
+        th { background: #1e3c72; color: white; }
+        .kpi { display: inline-block; background: #f8f9fa; padding: 8px 15px; border-radius: 8px; margin-right: 15px; }
+        .kpi-value { font-size: 24px; font-weight: bold; color: #f4a261; }
+        #plot { width: 100%; height: 500px; margin-top: 20px; }
+        @media (max-width: 768px) { .flex { flex-direction: column; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h3>📦 Configuración del Contenedor</h3>
+        <div class="flex">
+            <div class="form-group">
+                <label>Tipo de Contenedor</label>
+                <select id="containerType">
+                    <option value="20dry">20' Dry (5.90 x 2.35 x 2.39 m)</option>
+                    <option value="40dry">40' Dry (12.03 x 2.35 x 2.39 m)</option>
+                    <option value="20hc">20' High Cube (5.90 x 2.35 x 2.69 m)</option>
+                    <option value="40hc" selected>40' High Cube (12.03 x 2.35 x 2.69 m)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Proyecto</label>
+                <input type="text" id="projectName" placeholder="Nombre del proyecto">
+            </div>
+            <div class="form-group">
+                <label>Cliente</label>
+                <input type="text" id="clientName" placeholder="Cliente">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>📦 Agregar Producto / Mercancía</h3>
+        <div class="flex">
+            <div class="form-group"><label>Producto</label><input type="text" id="productName" placeholder="Nombre"></div>
+            <div class="form-group"><label>Largo (mm)</label><input type="number" id="boxL" value="500"></div>
+            <div class="form-group"><label>Ancho (mm)</label><input type="number" id="boxW" value="500"></div>
+            <div class="form-group"><label>Alto (mm)</label><input type="number" id="boxH" value="500"></div>
+            <div class="form-group"><label>Cantidad</label><input type="number" id="boxQty" value="1"></div>
+            <div class="form-group"><button onclick="addItem()">➕ Agregar</button></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>📋 Productos a cargar</h3>
+        <div style="overflow-x: auto;">
+            <table id="itemsTable">
+                <thead><tr><th>Producto</th><th>L (mm)</th><th>W (mm)</th><th>H (mm)</th><th>Cantidad</th><th>Volumen (m³)</th><th></th></tr></thead>
+                <tbody id="itemsBody"></tbody>
+            </table>
+        </div>
+        <div style="margin-top: 15px;">
+            <span class="kpi">📦 Volumen Total: <span class="kpi-value" id="totalVolume">0</span> m³</span>
+            <span class="kpi">📊 Ocupación: <span class="kpi-value" id="occupancy">0</span>%</span>
+            <span class="kpi">📦 Unidades: <span class="kpi-value" id="totalUnits">0</span></span>
+            <button onclick="calculate()" class="btn-primary" style="float: right;">🔄 Calcular Capacidad</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>📊 Visualización 3D del Contenedor</h3>
+        <div id="plot"></div>
+        <div id="resultText" style="margin-top: 15px; padding: 10px; background: #e8f5e9; border-radius: 8px; display: none;"></div>
+    </div>
+</div>
+
+<script>
+const CONTAINERS = {
+    '20dry': { name: '20\' Dry', L: 5.90, W: 2.35, H: 2.39, L_mm: 5900, W_mm: 2350, H_mm: 2390 },
+    '40dry': { name: '40\' Dry', L: 12.03, W: 2.35, H: 2.39, L_mm: 12030, W_mm: 2350, H_mm: 2390 },
+    '20hc': { name: '20\' High Cube', L: 5.90, W: 2.35, H: 2.69, L_mm: 5900, W_mm: 2350, H_mm: 2690 },
+    '40hc': { name: '40\' High Cube', L: 12.03, W: 2.35, H: 2.69, L_mm: 12030, W_mm: 2350, H_mm: 2690 }
+};
+
+let items = [];
+
+function addItem() {
+    const name = document.getElementById('productName').value || 'Producto';
+    const L = parseFloat(document.getElementById('boxL').value);
+    const W = parseFloat(document.getElementById('boxW').value);
+    const H = parseFloat(document.getElementById('boxH').value);
+    const qty = parseInt(document.getElementById('boxQty').value);
+    
+    if (!L || !W || !H || !qty) { alert('Complete todas las dimensiones'); return; }
+    
+    items.push({ name, L, W, H, qty });
+    updateTable();
+    calculate();
+    
+    document.getElementById('productName').value = '';
+    document.getElementById('boxL').value = '500';
+    document.getElementById('boxW').value = '500';
+    document.getElementById('boxH').value = '500';
+    document.getElementById('boxQty').value = '1';
+}
+
+function updateTable() {
+    const tbody = document.getElementById('itemsBody');
+    tbody.innerHTML = '';
+    let totalVol = 0;
+    let totalUnits = 0;
+    
+    items.forEach((item, i) => {
+        const vol = (item.L * item.W * item.H * item.qty) / 1e9;
+        totalVol += vol;
+        totalUnits += item.qty;
+        tbody.innerHTML += `<tr>
+            <td>${item.name}</td>
+            <td>${item.L}</td><td>${item.W}</td><td>${item.H}</td>
+            <td>${item.qty}</td><td>${vol.toFixed(3)}</td>
+            <td><button onclick="removeItem(${i})">🗑️</button></td>
+        </tr>`;
+    });
+    
+    document.getElementById('totalVolume').innerHTML = totalVol.toFixed(2);
+    document.getElementById('totalUnits').innerHTML = totalUnits;
+}
+
+function removeItem(index) {
+    items.splice(index, 1);
+    updateTable();
+    calculate();
+}
+
+function calculate() {
+    const containerType = document.getElementById('containerType').value;
+    const container = CONTAINERS[containerType];
+    const containerVol = container.L * container.W * container.H;
+    
+    let totalVol = items.reduce((sum, item) => sum + (item.L * item.W * item.H * item.qty) / 1e9, 0);
+    let occupancy = (totalVol / containerVol) * 100;
+    occupancy = Math.min(occupancy, 100).toFixed(1);
+    
+    document.getElementById('occupancy').innerHTML = occupancy;
+    
+    // Simple packing estimation
+    let maxUnits = 0;
+    items.forEach(item => {
+        const fitX = Math.floor(container.L_mm / item.L);
+        const fitY = Math.floor(container.W_mm / item.W);
+        const fitZ = Math.floor(container.H_mm / item.H);
+        const maxPerContainer = fitX * fitY * fitZ;
+        maxUnits += maxPerContainer;
+    });
+    
+    const resultDiv = document.getElementById('resultText');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `
+        <strong>📊 Resultado del cálculo:</strong><br>
+        • Contenedor: ${container.name}<br>
+        • Volumen total de carga: ${totalVol.toFixed(2)} m³<br>
+        • Capacidad del contenedor: ${containerVol.toFixed(2)} m³<br>
+        • Ocupación estimada: ${occupancy}%<br>
+        ${occupancy > 90 ? '⚠️ <strong>Advertencia:</strong> La ocupación es muy alta. Considere usar un contenedor más grande.' : ''}
+        ${occupancy < 50 ? '💡 <strong>Sugerencia:</strong> Podría usar un contenedor más pequeño para optimizar costos.' : ''}
+    `;
+    
+    drawPlot(container, items);
+}
+
+function drawPlot(container, items) {
+    const traces = [];
+    
+    // Contenedor wireframe
+    const x = [0, container.L, container.L, 0, 0, container.L, container.L, 0];
+    const y = [0, 0, container.W, container.W, 0, 0, container.W, container.W];
+    const z = [0, 0, 0, 0, container.H, container.H, container.H, container.H];
+    
+    traces.push({
+        type: 'scatter3d', mode: 'lines',
+        x: [x[0], x[1], x[2], x[3], x[0], x[4], x[5], x[6], x[7], x[4]],
+        y: [y[0], y[1], y[2], y[3], y[0], y[4], y[5], y[6], y[7], y[4]],
+        z: [z[0], z[1], z[2], z[3], z[0], z[4], z[5], z[6], z[7], z[4]],
+        line: { color: '#1e3c72', width: 3 }, name: 'Contenedor', showlegend: true
+    });
+    
+    // Simular algunas cajas
+    const colors = ['#f4a261', '#70b62c', '#3065af', '#e76f51'];
+    let posX = 0, posY = 0, posZ = 0;
+    let itemIndex = 0;
+    
+    for (let item of items) {
+        const l = item.L / 1000;
+        const w = item.W / 1000;
+        const h = item.H / 1000;
+        const color = colors[itemIndex % colors.length];
+        
+        for (let q = 0; q < Math.min(item.qty, 5); q++) {
+            if (posX + l > container.L) { posX = 0; posY += w; }
+            if (posY + w > container.W) { posX = 0; posY = 0; posZ += h; }
+            if (posZ + h > container.H) break;
+            
+            const x0 = posX, x1 = posX + l;
+            const y0 = posY, y1 = posY + w;
+            const z0 = posZ, z1 = posZ + h;
+            
+            traces.push({
+                type: 'mesh3d',
+                x: [x0, x1, x1, x0, x0, x1, x1, x0],
+                y: [y0, y0, y1, y1, y0, y0, y1, y1],
+                z: [z0, z0, z0, z0, z1, z1, z1, z1],
+                opacity: 0.7, color: color, name: item.name, showlegend: false,
+                hoverinfo: 'text', text: `${item.name} (${item.L}x${item.W}x${item.H} mm)`
+            });
+            
+            posX += l;
+        }
+        itemIndex++;
+        posX = 0; posY = 0; posZ = 0;
+    }
+    
+    const layout = {
+        scene: {
+            xaxis: { title: 'Largo (m)', range: [0, container.L + 0.2] },
+            yaxis: { title: 'Ancho (m)', range: [0, container.W + 0.2] },
+            zaxis: { title: 'Alto (m)', range: [0, container.H + 0.2] },
+            aspectmode: 'manual', aspectratio: { x: container.L, y: container.W, z: container.H },
+            camera: { eye: { x: 1.5, y: 1.2, z: 0.8 } }
+        },
+        margin: { l: 0, r: 0, b: 0, t: 30 },
+        title: { text: `Visualización 3D - ${container.name}`, font: { size: 14 } }
+    };
+    
+    Plotly.newPlot('plot', traces, layout, { responsive: true });
+}
+</script>
+</body>
+</html>

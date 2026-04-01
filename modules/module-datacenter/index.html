@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XIM - Data Center & UPS Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #f0f2f5; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; }
+        .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #f4a261; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card h3 { color: #1e3c72; margin-bottom: 15px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        button { background: #f4a261; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }
+        .kpi-card { background: #f8f9fa; padding: 15px; border-radius: 12px; text-align: center; }
+        .kpi-value { font-size: 28px; font-weight: 700; color: #f4a261; }
+        .kpi-label { font-size: 12px; color: #666; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
+        th { background: #1e3c72; color: white; }
+        .result-box { background: #f8f9fa; padding: 15px; border-radius: 12px; margin-top: 15px; }
+        @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2>🏢 Data Center & UPS Calculator</h2>
+        <p>Cálculo de capacidad de UPS, racks y equipamiento para data center</p>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <h3>🖥️ Equipos a instalar</h3>
+            <div class="form-group"><label>Equipo / Servidor</label><input type="text" id="equipoNombre" placeholder="Ej: Servidor HP DL380"></div>
+            <div class="form-group"><label>Potencia (W)</label><input type="number" id="equipoPotencia" placeholder="Watts"></div>
+            <div class="form-group"><label>Cantidad</label><input type="number" id="equipoCantidad" value="1"></div>
+            <div class="form-group"><label>Tipo</label><select id="equipoTipo"><option value="server">Servidor</option><option value="storage">Almacenamiento</option><option value="network">Networking</option></select></div>
+            <button onclick="agregarEquipo()">➕ Agregar equipo</button>
+            <div id="equiposList" class="result-box" style="margin-top:15px;">
+                <strong>Equipos:</strong>
+                <div id="equiposTable">No hay equipos</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>⚡ Configuración UPS</h3>
+            <div class="form-group"><label>Autonomía (minutos)</label><input type="number" id="autonomia" value="15"></div>
+            <div class="form-group"><label>Factor de potencia</label><input type="number" id="factorPotencia" value="0.9" step="0.01"></div>
+            <div class="form-group"><label>Redundancia</label><select id="redundancia"><option value="none">Sin redundancia (N)</option><option value="n+1">N+1</option><option value="2n">2N</option></select></div>
+            <div class="form-group"><label>Eficiencia UPS (%)</label><input type="number" id="eficiencia" value="95"></div>
+            <button onclick="calcularUPS()">🔋 Calcular UPS</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>📊 Resultados UPS</h3>
+        <div class="kpi-grid">
+            <div class="kpi-card"><div class="kpi-value" id="potenciaTotal">0</div><div class="kpi-label">Potencia Total (W)</div></div>
+            <div class="kpi-card"><div class="kpi-value" id="potenciaKVA">0</div><div class="kpi-label">Potencia (kVA)</div></div>
+            <div class="kpi-card"><div class="kpi-value" id="upsCapacidad">0</div><div class="kpi-label">UPS Recomendada (kVA)</div></div>
+            <div class="kpi-card"><div class="kpi-value" id="baterias">0</div><div class="kpi-label">Baterías (12V/7Ah)</div></div>
+        </div>
+        <div id="detalleUPS" class="result-box"></div>
+    </div>
+
+    <div class="card">
+        <h3>📦 Distribución en Racks</h3>
+        <div class="grid-2">
+            <div>
+                <div class="form-group"><label>Altura de rack (U)</label><select id="rackAltura"><option value="42">42U</option><option value="36">36U</option><option value="24">24U</option></select></div>
+                <div class="form-group"><label>Espacio por equipo (U)</label><input type="number" id="espacioEquipo" value="2"></div>
+                <button onclick="calcularRacks()">📊 Calcular racks</button>
+            </div>
+            <div id="racksResultado" class="result-box">
+                <strong>Racks necesarios:</strong>
+                <div id="racksNumero">-</div>
+                <div id="ocupacionRack">-</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let equipos = [];
+
+function agregarEquipo() {
+    const nombre = document.getElementById('equipoNombre').value;
+    const potencia = parseFloat(document.getElementById('equipoPotencia').value);
+    const cantidad = parseInt(document.getElementById('equipoCantidad').value);
+    if (!nombre || !potencia) { alert('Complete nombre y potencia'); return; }
+    equipos.push({ nombre, potencia, cantidad });
+    actualizarLista();
+    calcularUPS();
+    document.getElementById('equipoNombre').value = '';
+    document.getElementById('equipoPotencia').value = '';
+}
+
+function actualizarLista() {
+    const container = document.getElementById('equiposTable');
+    if (equipos.length === 0) { container.innerHTML = 'No hay equipos'; return; }
+    let html = '<table><thead><tr><th>Equipo</th><th>Potencia</th><th>Cantidad</th><th>Total</th><th></th></tr></thead><tbody>';
+    equipos.forEach((eq, i) => {
+        const total = eq.potencia * eq.cantidad;
+        html += `<tr><td>${eq.nombre}</td><td>${eq.potencia} W</td><td>${eq.cantidad}</td><td><strong>${total} W</strong></td><td><button onclick="eliminarEquipo(${i})">🗑️</button></td></tr>`;
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+function eliminarEquipo(index) { equipos.splice(index, 1); actualizarLista(); calcularUPS(); }
+
+function calcularUPS() {
+    let potenciaTotal = equipos.reduce((sum, eq) => sum + (eq.potencia * eq.cantidad), 0);
+    const factorPotencia = parseFloat(document.getElementById('factorPotencia').value);
+    const autonomia = parseFloat(document.getElementById('autonomia').value);
+    const eficiencia = parseFloat(document.getElementById('eficiencia').value) / 100;
+    const redundancia = document.getElementById('redundancia').value;
+    potenciaTotal = potenciaTotal / eficiencia;
+    const potenciaKVA = potenciaTotal / (factorPotencia * 1000);
+    let upsCapacidad = potenciaKVA;
+    if (redundancia === 'n+1') upsCapacidad = potenciaKVA * 1.2;
+    if (redundancia === '2n') upsCapacidad = potenciaKVA * 2;
+    upsCapacidad = Math.ceil(upsCapacidad / 10) * 10;
+    const energiaWh = potenciaTotal * (autonomia / 60);
+    const bateriaWh = 12 * 7;
+    let baterias = Math.ceil(energiaWh / bateriaWh);
+    baterias = Math.ceil(baterias / 2) * 2;
+    document.getElementById('potenciaTotal').innerHTML = Math.round(potenciaTotal).toLocaleString();
+    document.getElementById('potenciaKVA').innerHTML = potenciaKVA.toFixed(1);
+    document.getElementById('upsCapacidad').innerHTML = upsCapacidad;
+    document.getElementById('baterias').innerHTML = baterias;
+    document.getElementById('detalleUPS').innerHTML = `<strong>📋 Detalle:</strong><br>• Potencia equipos: ${equipos.reduce((sum, eq) => sum + (eq.potencia * eq.cantidad), 0)} W<br>• Con eficiencia: ${Math.round(potenciaTotal)} W<br>• Potencia kVA: ${potenciaKVA.toFixed(1)} kVA<br>• Redundancia: ${redundancia}<br>• Baterías: ${baterias} unidades`;
+}
+
+function calcularRacks() {
+    const alturaRack = parseInt(document.getElementById('rackAltura').value);
+    const espacioEquipo = parseInt(document.getElementById('espacioEquipo').value);
+    let totalU = equipos.reduce((sum, eq) => sum + (eq.cantidad * espacioEquipo), 0);
+    const racksNecesarios = Math.ceil(totalU / alturaRack);
+    const ocupacion = ((totalU / (racksNecesarios * alturaRack)) * 100).toFixed(1);
+    document.getElementById('racksNumero').innerHTML = `<span style="font-size:24px; color:#f4a261;">${racksNecesarios}</span> racks`;
+    document.getElementById('ocupacionRack').innerHTML = `Ocupación: ${ocupacion}% (${totalU} U / ${racksNecesarios * alturaRack} U)`;
+}
+</script>
+</body>
+</html>

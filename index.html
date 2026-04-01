@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XIM Power System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 28px; }
+        .header p { opacity: 0.8; font-size: 14px; margin-top: 5px; }
+        .tabs {
+            display: flex;
+            background: white;
+            justify-content: center;
+            gap: 5px;
+            padding: 0 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 15px 30px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { color: #f4a261; }
+        .tab-btn.active {
+            color: #f4a261;
+            border-bottom-color: #f4a261;
+        }
+        .container {
+            padding: 20px;
+            min-height: 500px;
+        }
+        .module-pane { display: none; }
+        .module-pane.active { display: block; }
+        iframe {
+            width: 100%;
+            height: calc(100vh - 200px);
+            border: none;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        footer {
+            background: #1e3c72;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-size: 12px;
+        }
+        @media (max-width: 768px) {
+            .tab-btn { padding: 10px 15px; font-size: 12px; }
+            iframe { height: calc(100vh - 250px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚡ XIM POWER SYSTEM</h1>
+        <p>Solución Integral para Logística, Fichas Técnicas y Data Center</p>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showModule('fichas')">📄 Fichas Técnicas con IA</button>
+        <button class="tab-btn" onclick="showModule('contenedores')">📦 Calculadora de Contenedores 3D</button>
+        <button class="tab-btn" onclick="showModule('datacenter')">🏢 Data Center / UPS</button>
+    </div>
+
+    <div class="container">
+        <div id="module-fichas" class="module-pane active">
+            <iframe src="modules/module-fichas/index.html"></iframe>
+        </div>
+        <div id="module-contenedores" class="module-pane">
+            <iframe src="modules/module-contenedores/index.html"></iframe>
+        </div>
+        <div id="module-datacenter" class="module-pane">
+            <iframe src="modules/module-datacenter/index.html"></iframe>
+        </div>
+    </div>
+
+    <footer>
+        <p>XIM POWER - Soluciones en Logística, Energía y Tecnología</p>
+    </footer>
+
+    <script>
+        function showModule(moduleName) {
+            document.querySelectorAll('.module-pane').forEach(function(pane) {
+                pane.classList.remove('active');
+            });
+            document.getElementById('module-' + moduleName).classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
