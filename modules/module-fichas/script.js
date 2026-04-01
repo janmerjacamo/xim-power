@@ -6,6 +6,10 @@ let extractedText = '';
 let detectedTables = [];
 let currentFile = null;
 
+// Configuración de DeepSeek
+const DEEPSEEK_URL = 'https://api.deepseek.com/v1/chat/completions';
+
+// Elementos DOM
 const apiKeyInput = document.getElementById('apiKey');
 const testApiBtn = document.getElementById('testApiBtn');
 const apiStatus = document.getElementById('apiStatus');
@@ -30,33 +34,43 @@ const copyAllTablesBtn = document.getElementById('copyAllTablesBtn');
 const copyTranslationBtn = document.getElementById('copyTranslationBtn');
 const tablesContainer = document.getElementById('tablesContainer');
 
-const savedKey = localStorage.getItem('gemini_key');
+// Cargar API Key guardada
+const savedKey = localStorage.getItem('deepseek_key');
 if (savedKey) apiKeyInput.value = savedKey;
 
 apiKeyInput.addEventListener('change', () => {
-    localStorage.setItem('gemini_key', apiKeyInput.value.trim());
+    localStorage.setItem('deepseek_key', apiKeyInput.value.trim());
 });
 
+// Probar conexión con DeepSeek
 testApiBtn.addEventListener('click', async () => {
     const apiKey = apiKeyInput.value.trim();
     if (!apiKey) {
-        alert('Ingresa una API Key de Gemini');
+        alert('Ingresa tu API Key de DeepSeek');
         return;
     }
     
-    updateApiStatus('probando', '🟡 Probando...');
+    updateApiStatus('probando', '🟡 Probando conexión con DeepSeek...');
     
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+        const response = await fetch(DEEPSEEK_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: "Responde solo 'OK'" }] }]
+                model: 'deepseek-chat',
+                messages: [{ role: 'user', content: 'Responde solo "OK"' }],
+                max_tokens: 10
             })
         });
+        
         const data = await response.json();
         if (data.error) throw new Error(data.error.message);
-        updateApiStatus('online', '✅ Conectado a Gemini');
+        
+        updateApiStatus('online', '✅ Conectado a DeepSeek');
+        alert('✅ Conexión exitosa con DeepSeek');
     } catch (error) {
         updateApiStatus('offline', '❌ Error de conexión');
         alert('Error: ' + error.message);
@@ -65,9 +79,10 @@ testApiBtn.addEventListener('click', async () => {
 
 function updateApiStatus(status, text) {
     apiStatus.className = `status-badge status-${status}`;
-    apiStatus.innerHTML = `<span>${status === 'online' ? '✅' : status === 'offline' ? '❌' : '🟡'}</span> ${text}`;
+    apiStatus.innerHTML = `<i class="fas fa-circle"></i> ${text}`;
 }
 
+// Subir PDF
 uploadBtn.addEventListener('click', () => pdfFileInput.click());
 
 pdfFileInput.addEventListener('change', async (e) => {
@@ -83,6 +98,7 @@ pdfFileInput.addEventListener('change', async (e) => {
     fileInfo.style.display = 'block';
 });
 
+// Extraer texto del PDF
 extractBtn.addEventListener('click', async () => {
     if (!pdfDoc) {
         alert('Primero selecciona un archivo PDF');
@@ -90,7 +106,7 @@ extractBtn.addEventListener('click', async () => {
     }
     
     extractBtn.disabled = true;
-    extractBtn.textContent = '⏳ Extrayendo...';
+    extractBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Extrayendo...';
     progressContainer.style.display = 'block';
     
     let fullText = '';
@@ -129,14 +145,15 @@ extractBtn.addEventListener('click', async () => {
     mostrarTablas();
     
     extractBtn.disabled = false;
-    extractBtn.textContent = '✅ Extraído correctamente';
+    extractBtn.innerHTML = '<i class="fas fa-magic"></i> Extraído correctamente';
     progressContainer.style.display = 'none';
     
     setTimeout(() => {
-        extractBtn.textContent = '🔍 Extraer y analizar';
+        extractBtn.innerHTML = '<i class="fas fa-magic"></i> Extraer y analizar';
     }, 2000);
 });
 
+// Detectar tablas en texto
 function detectarTablasEnTexto(texto) {
     const tablas = [];
     const lineas = texto.split('\n');
@@ -176,13 +193,13 @@ function tablaAHtml(textoTabla) {
                 if (celdas.length > 0) {
                     html += '个';
                     for (let celda of celdas) {
-                        html += `<td style="border:1px solid #ddd; padding:8px;">${escapeHtml(celda.trim())}</td>`;
+                        html += `<td style="border:1px solid #ddd; padding:8px;">${escapeHtml(celda.trim())}嫩`;
                     }
-                    html += '</tr>';
+                    html += '(<';
                 }
             }
         }
-        html += '</table>';
+        html += '}<';
         return html;
     } else {
         return `<pre style="white-space:pre-wrap;">${escapeHtml(textoTabla)}</pre>`;
@@ -191,7 +208,7 @@ function tablaAHtml(textoTabla) {
 
 function mostrarTablas() {
     if (detectedTables.length === 0) {
-        tablesContainer.innerHTML = '<div class="empty-state"><span>📭</span><p>No se detectaron tablas en este documento</p></div>';
+        tablesContainer.innerHTML = '<div class="empty-state"><i class="fas fa-table"></i><p>No se detectaron tablas en este documento</p></div>';
         return;
     }
     
@@ -200,8 +217,8 @@ function mostrarTablas() {
         html += `
             <div class="table-item">
                 <div class="table-header">
-                    <span>📊 Tabla ${idx + 1} - Página ${table.pagina}</span>
-                    <button onclick="copiarTabla(${idx})" class="btn-icon">📋 Copiar</button>
+                    <span><i class="fas fa-table"></i> Tabla ${idx + 1} - Página ${table.pagina}</span>
+                    <button onclick="copiarTabla(${idx})" class="btn-icon"><i class="fas fa-copy"></i> Copiar</button>
                 </div>
                 <div class="table-content">
                     ${table.html}
@@ -212,46 +229,83 @@ function mostrarTablas() {
     tablesContainer.innerHTML = html;
 }
 
+// TRADUCCIÓN CON DEEPSEEK
 translateBtn.addEventListener('click', async () => {
     const apiKey = apiKeyInput.value.trim();
-    if (!apiKey) { alert('Configura tu API Key de Gemini'); return; }
-    if (!extractedText) { alert('Primero extrae el texto de un PDF'); return; }
+    if (!apiKey) { 
+        alert('Configura tu API Key de DeepSeek primero'); 
+        return; 
+    }
+    if (!extractedText) { 
+        alert('Primero extrae el texto de un PDF'); 
+        return; 
+    }
     
     translateBtn.disabled = true;
-    translateBtn.textContent = '🔄 Traduciendo...';
-    translatedTextArea.value = 'Traduciendo con IA...';
+    translateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traduciendo...';
+    translatedTextArea.value = 'Traduciendo con DeepSeek...';
     
     try {
-        const prompt = `Traduce al español técnico:\n\n${extractedText.substring(0, 6000)}`;
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+        const response = await fetch(DEEPSEEK_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.3 } })
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'deepseek-chat',
+                messages: [
+                    { 
+                        role: 'system', 
+                        content: 'Eres un traductor técnico especializado en fichas técnicas. Traduce del inglés al español manteniendo la terminología técnica precisa.' 
+                    },
+                    { 
+                        role: 'user', 
+                        content: `Traduce este texto técnico al español:\n\n${extractedText.substring(0, 4000)}` 
+                    }
+                ],
+                temperature: 0.3,
+                max_tokens: 2000
+            })
         });
+        
         const data = await response.json();
         if (data.error) throw new Error(data.error.message);
-        translatedTextArea.value = data.candidates[0].content.parts[0].text;
+        
+        translatedTextArea.value = data.choices[0].message.content;
     } catch (error) {
         translatedTextArea.value = `Error: ${error.message}`;
         alert('Error: ' + error.message);
     } finally {
         translateBtn.disabled = false;
-        translateBtn.textContent = '🔄 Traducir con IA';
+        translateBtn.innerHTML = '<i class="fas fa-play"></i> Traducir con IA';
     }
 });
 
+// Botones de copiar
 copyTextBtn.addEventListener('click', () => {
-    if (extractedTextArea.value) { navigator.clipboard.writeText(extractedTextArea.value); alert('✅ Texto copiado'); }
+    if (extractedTextArea.value) { 
+        navigator.clipboard.writeText(extractedTextArea.value); 
+        alert('✅ Texto copiado'); 
+    }
 });
 
 copyTranslationBtn.addEventListener('click', () => {
-    if (translatedTextArea.value && translatedTextArea.value !== 'Traduciendo con IA...') { navigator.clipboard.writeText(translatedTextArea.value); alert('✅ Traducción copiada'); }
+    if (translatedTextArea.value && translatedTextArea.value !== 'Traduciendo con DeepSeek...') { 
+        navigator.clipboard.writeText(translatedTextArea.value); 
+        alert('✅ Traducción copiada'); 
+    }
 });
 
 copyAllTablesBtn.addEventListener('click', () => {
-    if (detectedTables.length === 0) { alert('No hay tablas'); return; }
+    if (detectedTables.length === 0) { 
+        alert('No hay tablas'); 
+        return; 
+    }
     let allTables = '';
-    detectedTables.forEach((t, i) => { allTables += `--- TABLA ${i+1} (Pág ${t.pagina}) ---\n${t.contenido}\n\n`; });
+    detectedTables.forEach((t, i) => { 
+        allTables += `--- TABLA ${i+1} (Pág ${t.pagina}) ---\n${t.contenido}\n\n`; 
+    });
     navigator.clipboard.writeText(allTables);
     alert(`✅ ${detectedTables.length} tablas copiadas`);
 });
@@ -262,7 +316,10 @@ clearTextBtn.addEventListener('click', () => {
 });
 
 window.copiarTabla = (index) => {
-    if (detectedTables[index]) { navigator.clipboard.writeText(detectedTables[index].contenido); alert(`✅ Tabla ${index+1} copiada`); }
+    if (detectedTables[index]) { 
+        navigator.clipboard.writeText(detectedTables[index].contenido); 
+        alert(`✅ Tabla ${index+1} copiada`); 
+    }
 };
 
 function escapeHtml(text) {
@@ -271,6 +328,7 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Tabs
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const tabName = btn.dataset.tab;
@@ -281,4 +339,4 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     });
 });
 
-console.log('Módulo de Fichas Técnicas cargado');
+console.log('Módulo de Fichas Técnicas cargado con DeepSeek');

@@ -5,15 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XIM - Fichas Técnicas con IA</title>
     <link rel="stylesheet" href="./styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="xim-fichas-container">
         <div class="module-header">
-            <div class="header-icon">📄</div>
+            <div class="header-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
             <div>
                 <h1>Fichas Técnicas con IA</h1>
-                <p>Extrae texto, detecta tablas y traduce con Gemini</p>
+                <p>Extrae texto, detecta tablas y traduce con DeepSeek</p>
             </div>
         </div>
 
@@ -21,16 +24,18 @@
             <div class="panel-left">
                 <div class="card">
                     <div class="card-title">
-                        <span>🤖</span>
+                        <i class="fas fa-key"></i>
                         <h3>Configuración IA</h3>
                     </div>
                     <div class="card-body">
                         <div class="api-config">
-                            <label>API Key de Google Gemini</label>
-                            <input type="password" id="apiKey" placeholder="Ingresa tu API Key" class="api-input">
-                            <button id="testApiBtn" class="btn-secondary">🔌 Probar conexión</button>
+                            <label>API Key de DeepSeek</label>
+                            <input type="password" id="apiKey" placeholder="sk-..." class="api-input">
+                            <button id="testApiBtn" class="btn-secondary">
+                                <i class="fas fa-plug"></i> Probar conexión
+                            </button>
                             <div id="apiStatus" class="status-badge status-offline">
-                                <span>⚪</span> No conectado
+                                <i class="fas fa-circle"></i> No conectado
                             </div>
                         </div>
                     </div>
@@ -38,23 +43,29 @@
 
                 <div class="card">
                     <div class="card-title">
-                        <span>📁</span>
+                        <i class="fas fa-upload"></i>
                         <h3>Cargar Documento</h3>
                     </div>
                     <div class="card-body">
                         <div class="upload-area" id="uploadArea">
-                            <div class="upload-icon">📄</div>
+                            <div class="upload-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
                             <p>Arrastra o haz clic para seleccionar un PDF</p>
                             <input type="file" id="pdfFile" accept=".pdf" hidden>
-                            <button id="uploadBtn" class="btn-primary">Seleccionar archivo</button>
+                            <button id="uploadBtn" class="btn-primary">
+                                <i class="fas fa-folder-open"></i> Seleccionar archivo
+                            </button>
                         </div>
                         <div id="fileInfo" class="file-info" style="display: none;">
                             <div class="file-detail">
-                                <span>📄</span>
+                                <i class="fas fa-file-pdf"></i>
                                 <span id="fileName"></span>
                                 <span id="pageCount" class="badge"></span>
                             </div>
-                            <button id="extractBtn" class="btn-success">🔍 Extraer y analizar</button>
+                            <button id="extractBtn" class="btn-success">
+                                <i class="fas fa-magic"></i> Extraer y analizar
+                            </button>
                         </div>
                         <div id="progressContainer" class="progress-container" style="display: none;">
                             <div class="progress-bar" id="progressBar"></div>
@@ -65,7 +76,7 @@
 
                 <div class="card">
                     <div class="card-title">
-                        <span>📊</span>
+                        <i class="fas fa-chart-simple"></i>
                         <h3>Estadísticas</h3>
                     </div>
                     <div class="card-body">
@@ -89,19 +100,29 @@
 
             <div class="panel-right">
                 <div class="tabs-container">
-                    <button class="tab-btn active" data-tab="text">📝 Texto Extraído</button>
-                    <button class="tab-btn" data-tab="tables">📊 Tablas Detectadas</button>
-                    <button class="tab-btn" data-tab="translate">🌐 Traducción</button>
+                    <button class="tab-btn active" data-tab="text">
+                        <i class="fas fa-file-lines"></i> Texto Extraído
+                    </button>
+                    <button class="tab-btn" data-tab="tables">
+                        <i class="fas fa-table"></i> Tablas Detectadas
+                    </button>
+                    <button class="tab-btn" data-tab="translate">
+                        <i class="fas fa-language"></i> Traducción
+                    </button>
                 </div>
 
                 <div id="tab-text" class="tab-content active">
                     <div class="card">
                         <div class="card-title">
-                            <span>📝</span>
+                            <i class="fas fa-file-lines"></i>
                             <h3>Texto Extraído</h3>
                             <div class="card-actions">
-                                <button id="copyTextBtn" class="btn-icon" title="Copiar">📋</button>
-                                <button id="clearTextBtn" class="btn-icon" title="Limpiar">🗑️</button>
+                                <button id="copyTextBtn" class="btn-icon" title="Copiar">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button id="clearTextBtn" class="btn-icon" title="Limpiar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="card-body">
@@ -113,13 +134,15 @@
                 <div id="tab-tables" class="tab-content">
                     <div class="card">
                         <div class="card-title">
-                            <span>📊</span>
+                            <i class="fas fa-table"></i>
                             <h3>Tablas Detectadas</h3>
-                            <button id="copyAllTablesBtn" class="btn-icon">📋 Copiar todas</button>
+                            <button id="copyAllTablesBtn" class="btn-icon">
+                                <i class="fas fa-copy"></i> Copiar todas
+                            </button>
                         </div>
                         <div class="card-body" id="tablesContainer">
                             <div class="empty-state">
-                                <span>📭</span>
+                                <i class="fas fa-table"></i>
                                 <p>No hay tablas detectadas aún</p>
                             </div>
                         </div>
@@ -129,11 +152,15 @@
                 <div id="tab-translate" class="tab-content">
                     <div class="card">
                         <div class="card-title">
-                            <span>🌐</span>
+                            <i class="fas fa-language"></i>
                             <h3>Traducción al Español</h3>
                             <div class="card-actions">
-                                <button id="translateBtn" class="btn-primary">🔄 Traducir con IA</button>
-                                <button id="copyTranslationBtn" class="btn-icon">📋</button>
+                                <button id="translateBtn" class="btn-primary">
+                                    <i class="fas fa-play"></i> Traducir con IA
+                                </button>
+                                <button id="copyTranslationBtn" class="btn-icon">
+                                    <i class="fas fa-copy"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="card-body">
@@ -145,7 +172,7 @@
         </div>
 
         <div class="module-footer">
-            <p>💡 <strong>Consejo:</strong> La IA detecta automáticamente tablas técnicas. Usa el botón "Traducir" para obtener el texto en español técnico.</p>
+            <p><i class="fas fa-lightbulb"></i> <strong>Consejo:</strong> DeepSeek traduce documentos técnicos manteniendo la terminología precisa. La detección de tablas es automática.</p>
         </div>
     </div>
 
