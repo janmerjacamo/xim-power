@@ -79,10 +79,9 @@ testApiBtn.addEventListener('click', async () => {
 
 function updateApiStatus(status, text) {
     apiStatus.className = `status-badge status-${status}`;
-    apiStatus.innerHTML = `<i class="fas fa-circle"></i> ${text}`;
+    apiStatus.innerHTML = `<span>${status === 'online' ? '✅' : status === 'offline' ? '❌' : '🟡'}</span> ${text}`;
 }
 
-// Subir PDF
 uploadBtn.addEventListener('click', () => pdfFileInput.click());
 
 pdfFileInput.addEventListener('change', async (e) => {
@@ -98,7 +97,6 @@ pdfFileInput.addEventListener('change', async (e) => {
     fileInfo.style.display = 'block';
 });
 
-// Extraer texto del PDF
 extractBtn.addEventListener('click', async () => {
     if (!pdfDoc) {
         alert('Primero selecciona un archivo PDF');
@@ -106,7 +104,7 @@ extractBtn.addEventListener('click', async () => {
     }
     
     extractBtn.disabled = true;
-    extractBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Extrayendo...';
+    extractBtn.textContent = '⏳ Extrayendo...';
     progressContainer.style.display = 'block';
     
     let fullText = '';
@@ -145,15 +143,14 @@ extractBtn.addEventListener('click', async () => {
     mostrarTablas();
     
     extractBtn.disabled = false;
-    extractBtn.innerHTML = '<i class="fas fa-magic"></i> Extraído correctamente';
+    extractBtn.textContent = '✅ Extraído correctamente';
     progressContainer.style.display = 'none';
     
     setTimeout(() => {
-        extractBtn.innerHTML = '<i class="fas fa-magic"></i> Extraer y analizar';
+        extractBtn.textContent = '🔍 Extraer y analizar';
     }, 2000);
 });
 
-// Detectar tablas en texto
 function detectarTablasEnTexto(texto) {
     const tablas = [];
     const lineas = texto.split('\n');
@@ -191,15 +188,15 @@ function tablaAHtml(textoTabla) {
             if (linea.includes('|')) {
                 const celdas = linea.split('|').filter(c => c.trim().length > 0);
                 if (celdas.length > 0) {
-                    html += '个';
+                    html += '<tr>';
                     for (let celda of celdas) {
-                        html += `<td style="border:1px solid #ddd; padding:8px;">${escapeHtml(celda.trim())}嫩`;
+                        html += `<td style="border:1px solid #ddd; padding:8px;">${escapeHtml(celda.trim())}</td>`;
                     }
-                    html += '(<';
+                    html += '</tr>';
                 }
             }
         }
-        html += '}<';
+        html += '</table>';
         return html;
     } else {
         return `<pre style="white-space:pre-wrap;">${escapeHtml(textoTabla)}</pre>`;
@@ -208,7 +205,7 @@ function tablaAHtml(textoTabla) {
 
 function mostrarTablas() {
     if (detectedTables.length === 0) {
-        tablesContainer.innerHTML = '<div class="empty-state"><i class="fas fa-table"></i><p>No se detectaron tablas en este documento</p></div>';
+        tablesContainer.innerHTML = '<div class="empty-state"><span>📭</span><p>No se detectaron tablas en este documento</p></div>';
         return;
     }
     
@@ -217,8 +214,8 @@ function mostrarTablas() {
         html += `
             <div class="table-item">
                 <div class="table-header">
-                    <span><i class="fas fa-table"></i> Tabla ${idx + 1} - Página ${table.pagina}</span>
-                    <button onclick="copiarTabla(${idx})" class="btn-icon"><i class="fas fa-copy"></i> Copiar</button>
+                    <span>📊 Tabla ${idx + 1} - Página ${table.pagina}</span>
+                    <button onclick="copiarTabla(${idx})" class="btn-icon">📋 Copiar</button>
                 </div>
                 <div class="table-content">
                     ${table.html}
@@ -242,7 +239,7 @@ translateBtn.addEventListener('click', async () => {
     }
     
     translateBtn.disabled = true;
-    translateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traduciendo...';
+    translateBtn.textContent = '🔄 Traduciendo...';
     translatedTextArea.value = 'Traduciendo con DeepSeek...';
     
     try {
@@ -278,11 +275,10 @@ translateBtn.addEventListener('click', async () => {
         alert('Error: ' + error.message);
     } finally {
         translateBtn.disabled = false;
-        translateBtn.innerHTML = '<i class="fas fa-play"></i> Traducir con IA';
+        translateBtn.textContent = '🔄 Traducir con IA';
     }
 });
 
-// Botones de copiar
 copyTextBtn.addEventListener('click', () => {
     if (extractedTextArea.value) { 
         navigator.clipboard.writeText(extractedTextArea.value); 
@@ -328,7 +324,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Tabs
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const tabName = btn.dataset.tab;
