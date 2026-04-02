@@ -18,7 +18,7 @@
             padding: 20px;
         }
         .login-card {
-            max-width: 400px;
+            max-width: 450px;
             width: 100%;
             background: white;
             border-radius: 24px;
@@ -33,9 +33,29 @@
         }
         .login-header i { font-size: 48px; margin-bottom: 15px; }
         .login-header h1 { font-size: 24px; margin-bottom: 5px; }
-        .login-body { padding: 30px; }
+        .login-header p { font-size: 13px; opacity: 0.8; }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            color: #5A6874;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            color: #E6163E;
+            border-bottom: 2px solid #E6163E;
+        }
+        .tab-content { display: none; padding: 30px; }
+        .tab-content.active { display: block; }
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 500; color: #5A6874; margin-bottom: 8px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 500; color: #5A6874; margin-bottom: 8px; }
         .form-group input {
             width: 100%;
             padding: 12px 15px;
@@ -44,7 +64,7 @@
             font-family: 'Inter', sans-serif;
             font-size: 14px;
         }
-        .btn-login {
+        .btn-submit {
             width: 100%;
             padding: 12px;
             background: #E6163E;
@@ -53,19 +73,12 @@
             border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
-            font-size: 15px;
+            margin-top: 10px;
         }
-        .btn-login:hover { background: #c41236; }
-        .alert { padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; background: #FEF2F2; color: #DC2626; border-left: 3px solid #DC2626; }
-        .demo-info {
-            margin-top: 20px;
-            padding: 12px;
-            background: #F8FAFC;
-            border-radius: 12px;
-            font-size: 12px;
-            color: #5A6874;
-            text-align: center;
-        }
+        .btn-submit:hover { background: #c41236; }
+        .alert { padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; }
+        .alert-error { background: #FEF2F2; color: #DC2626; border-left: 3px solid #DC2626; }
+        .alert-success { background: #ECFDF5; color: #065F46; border-left: 3px solid #10B981; }
     </style>
 </head>
 <body>
@@ -73,54 +86,162 @@
         <div class="login-header">
             <i class="fas fa-cubes"></i>
             <h1>XIM POWER</h1>
-            <p>Acceso al sistema</p>
+            <p>Plataforma de gestión técnica</p>
         </div>
-        <div class="login-body">
-            <div id="alertMsg"></div>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="login">Iniciar sesión</button>
+            <button class="tab-btn" data-tab="register">Registrarse</button>
+        </div>
+        <div id="tab-login" class="tab-content active">
+            <div id="loginAlert"></div>
             <form id="loginForm">
                 <div class="form-group">
-                    <label>Usuario</label>
-                    <input type="text" id="username" placeholder="Ingresa tu usuario" required>
+                    <label>Correo electrónico</label>
+                    <input type="email" id="loginEmail" placeholder="correo@empresa.com" required>
                 </div>
                 <div class="form-group">
                     <label>Contraseña</label>
-                    <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
+                    <input type="password" id="loginPassword" placeholder="Contraseña" required>
                 </div>
-                <button type="submit" class="btn-login">Ingresar</button>
+                <button type="submit" class="btn-submit">Ingresar</button>
             </form>
-            <div class="demo-info">
-                <i class="fas fa-info-circle"></i> Contacta al administrador para obtener tus credenciales
-            </div>
+        </div>
+        <div id="tab-register" class="tab-content">
+            <div id="registerAlert"></div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>Nombre completo</label>
+                    <input type="text" id="regName" placeholder="Tu nombre" required>
+                </div>
+                <div class="form-group">
+                    <label>Correo electrónico</label>
+                    <input type="email" id="regEmail" placeholder="correo@empresa.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" required>
+                </div>
+                <div class="form-group">
+                    <label>Confirmar contraseña</label>
+                    <input type="password" id="regConfirmPassword" placeholder="Repite la contraseña" required>
+                </div>
+                <button type="submit" class="btn-submit">Crear cuenta</button>
+            </form>
         </div>
     </div>
     <script>
-        let users = JSON.parse(localStorage.getItem('xim_users')) || {
-            'admin': { password: 'xim2024', name: 'Administrador', role: 'admin', email: 'admin@ximpower.com' },
-            'juan': { password: 'juan123', name: 'Juan Pérez', role: 'editor', email: 'juan@ximpower.com' },
-            'maria': { password: 'maria123', name: 'María García', role: 'viewer', email: 'maria@ximpower.com' }
-        };
-        localStorage.setItem('xim_users', JSON.stringify(users));
-        
-        function showAlert(msg) {
-            document.getElementById('alertMsg').innerHTML = `<div class="alert">${msg}</div>`;
-            setTimeout(() => { document.getElementById('alertMsg').innerHTML = ''; }, 3000);
+        // Inicializar usuarios si no existen
+        if (!localStorage.getItem('xim_users')) {
+            const defaultUsers = {
+                'admin@ximpower.com': { 
+                    password: 'admin123', 
+                    name: 'Administrador', 
+                    role: 'admin', 
+                    email: 'admin@ximpower.com',
+                    createdAt: new Date().toISOString()
+                }
+            };
+            localStorage.setItem('xim_users', JSON.stringify(defaultUsers));
         }
         
+        // Tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.getElementById(`tab-${tab}`).classList.add('active');
+            });
+        });
+        
+        function showAlert(container, message, type) {
+            const alertDiv = document.getElementById(container);
+            alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => { alertDiv.innerHTML = ''; }, 4000);
+        }
+        
+        // Registro
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirmPassword').value;
+            
+            if (!name || !email || !password) {
+                showAlert('registerAlert', 'Todos los campos son obligatorios', 'error');
+                return;
+            }
+            
+            if (password !== confirm) {
+                showAlert('registerAlert', 'Las contraseñas no coinciden', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAlert('registerAlert', 'La contraseña debe tener al menos 6 caracteres', 'error');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('xim_users'));
+            
+            if (users[email]) {
+                showAlert('registerAlert', 'Este correo ya está registrado', 'error');
+                return;
+            }
+            
+            users[email] = {
+                password: password,
+                name: name,
+                role: 'viewer',
+                email: email,
+                createdAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('xim_users', JSON.stringify(users));
+            showAlert('registerAlert', 'Cuenta creada exitosamente. Ahora puedes iniciar sesión.', 'success');
+            
+            // Limpiar formulario
+            document.getElementById('regName').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regConfirmPassword').value = '';
+            
+            // Cambiar a pestaña login
+            document.querySelector('.tab-btn[data-tab="login"]').click();
+        });
+        
+        // Login
         document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-            const user = users[username];
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const users = JSON.parse(localStorage.getItem('xim_users'));
+            
+            const user = users[email];
             
             if (user && user.password === password) {
-                const session = { username, name: user.name, role: user.role, email: user.email };
+                const session = {
+                    email: email,
+                    name: user.name,
+                    role: user.role,
+                    loginTime: new Date().toISOString()
+                };
                 localStorage.setItem('xim_session', JSON.stringify(session));
+                
+                // Registrar actividad
+                let analytics = JSON.parse(localStorage.getItem('xim_analytics')) || [];
+                analytics.push({ user: email, action: 'login', timestamp: new Date().toISOString() });
+                localStorage.setItem('xim_analytics', JSON.stringify(analytics));
+                
                 window.location.href = 'dashboard.html';
             } else {
-                showAlert('Usuario o contraseña incorrectos');
+                showAlert('loginAlert', 'Correo o contraseña incorrectos', 'error');
             }
         });
         
+        // Redirigir si ya hay sesión
         if (localStorage.getItem('xim_session')) {
             window.location.href = 'dashboard.html';
         }
