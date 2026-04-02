@@ -3,48 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XIM - Container Load Calculator</title>
+    <title>XIM - Container Load Planner 3D</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #F1F5F9; padding: 20px; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #F1F5F9;
+            padding: 20px;
+        }
         .container-module { max-width: 1600px; margin: 0 auto; }
-        .module-header { background: linear-gradient(135deg, #0A1E3C 0%, #043C7C 100%); color: white; padding: 20px 25px; border-radius: 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 15px; }
-        .header-icon { font-size: 32px; background: rgba(255,255,255,0.15); width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
-        .module-header h1 { font-size: 24px; font-weight: 600; margin-bottom: 5px; }
-        .module-header p { opacity: 0.8; font-size: 14px; }
-        .main-grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; }
-        .card { background: white; border-radius: 16px; border: 1px solid #E2E8F0; overflow: hidden; margin-bottom: 24px; }
-        .card-header { padding: 16px 20px; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; gap: 10px; }
+        
+        /* Header XIM */
+        .module-header {
+            background: #043C7C;
+            padding: 20px 25px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .header-icon { font-size: 28px; background: rgba(255,255,255,0.12); width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+        .module-header h1 { font-size: 22px; font-weight: 600; color: white; margin-bottom: 4px; }
+        .module-header p { font-size: 13px; color: rgba(255,255,255,0.7); }
+        
+        /* Grid */
+        .main-grid { display: grid; grid-template-columns: 360px 1fr; gap: 24px; }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #E9ECEF;
+            overflow: hidden;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .card-header {
+            padding: 14px 20px;
+            background: white;
+            border-bottom: 1px solid #F0F2F5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
         .card-header i { font-size: 18px; color: #E6163E; }
-        .card-header h3 { font-size: 15px; font-weight: 600; color: #0F172A; flex: 1; }
+        .card-header h3 { font-size: 14px; font-weight: 600; color: #1A2C3E; flex: 1; }
         .card-body { padding: 20px; }
+        
+        /* Formulario */
         .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 12px; font-weight: 500; color: #475569; margin-bottom: 6px; }
-        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 14px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 500; color: #5A6874; margin-bottom: 6px; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #E6163E;
+            box-shadow: 0 0 0 3px rgba(230,22,62,0.08);
+        }
         .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .btn-primary, .btn-secondary, .btn-success, .btn-danger { border: none; border-radius: 8px; padding: 10px 16px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-family: 'Inter', sans-serif; }
+        
+        /* Botones */
+        .btn-primary, .btn-secondary, .btn-success, .btn-danger {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-weight: 500;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+        }
         .btn-primary { background: #E6163E; color: white; }
         .btn-primary:hover { background: #c41236; }
-        .btn-secondary { background: #1E293B; color: white; }
+        .btn-secondary { background: #F1F5F9; color: #2C3E50; border: 1px solid #E2E8F0; }
+        .btn-secondary:hover { background: #E9ECEF; }
         .btn-success { background: #059669; color: white; }
-        .btn-danger { background: #DC2626; color: white; }
-        .items-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .items-table th { text-align: left; padding: 10px 8px; background: #F8FAFC; color: #475569; border-bottom: 1px solid #E2E8F0; }
+        .btn-success:hover { background: #047857; }
+        .btn-danger { background: #FEF2F2; color: #DC2626; border: 1px solid #FEE2E2; }
+        
+        /* Tabla items */
+        .items-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .items-table th { text-align: left; padding: 10px 8px; background: #F8FAFC; color: #5A6874; border-bottom: 1px solid #E9ECEF; }
         .items-table td { padding: 10px 8px; border-bottom: 1px solid #F1F5F9; }
+        
+        /* KPIs */
         .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 15px; }
-        .kpi-card { background: #F8FAFC; border-radius: 12px; padding: 12px; text-align: center; }
-        .kpi-value { font-size: 28px; font-weight: 700; color: #E6163E; }
-        .kpi-label { font-size: 11px; color: #64748B; margin-top: 4px; }
-        .plot-container { background: white; border-radius: 16px; border: 1px solid #E2E8F0; overflow: hidden; }
-        .plot-header { padding: 12px 16px; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center; }
+        .kpi-card { background: #F8FAFC; border-radius: 14px; padding: 12px; text-align: center; border: 1px solid #F0F2F5; }
+        .kpi-value { font-size: 26px; font-weight: 700; color: #E6163E; }
+        .kpi-label { font-size: 11px; color: #7E8C9A; margin-top: 4px; }
+        
+        /* Plot 3D */
+        .plot-container { background: white; border-radius: 16px; border: 1px solid #E9ECEF; overflow: hidden; }
+        .plot-header { padding: 12px 16px; background: white; border-bottom: 1px solid #F0F2F5; display: flex; justify-content: space-between; align-items: center; }
         #plot { width: 100%; height: 550px; }
-        .alert { padding: 12px; border-radius: 8px; margin-top: 12px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-        .alert-warning { background: #FEF3C7; color: #92400E; border-left: 3px solid #F59E0B; }
-        .alert-success { background: #DCFCE7; color: #166534; border-left: 3px solid #10B981; }
-        .module-footer { margin-top: 24px; padding: 12px 20px; background: #F8FAFC; border-radius: 12px; font-size: 12px; color: #475569; text-align: center; border: 1px solid #E2E8F0; }
+        
+        /* Alertas */
+        .alert { padding: 12px; border-radius: 12px; margin-top: 12px; font-size: 12px; display: flex; align-items: center; gap: 8px; }
+        .alert-warning { background: #FFFBEB; color: #B45309; border-left: 3px solid #F59E0B; }
+        .alert-success { background: #ECFDF5; color: #065F46; border-left: 3px solid #10B981; }
+        
+        .module-footer { margin-top: 24px; padding: 12px 20px; background: white; border-radius: 14px; font-size: 11px; color: #7E8C9A; text-align: center; border: 1px solid #E9ECEF; }
+        
         @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -52,25 +129,34 @@
     <div class="container-module">
         <div class="module-header">
             <div class="header-icon"><i class="fas fa-cubes"></i></div>
-            <div><h1>Container Load Calculator</h1><p>Planificación de carga según estándares ISO 668 | Visualización 3D profesional</p></div>
+            <div>
+                <h1>Container Load Planner 3D</h1>
+                <p>Planificación de carga | Estándares ISO 668 | Visualización 3D interactiva</p>
+            </div>
         </div>
+        
         <div class="main-grid">
+            <!-- Panel izquierdo -->
             <div>
                 <div class="card">
                     <div class="card-header"><i class="fas fa-ship"></i><h3>Contenedor ISO</h3></div>
                     <div class="card-body">
-                        <div class="form-group"><label>Tipo de contenedor</label>
+                        <div class="form-group">
+                            <label>Tipo de contenedor</label>
                             <select id="containerType">
-                                <option value="20ft">20 ft Dry (5.90 x 2.35 x 2.39 m) - ISO 668</option>
-                                <option value="40ft" selected>40 ft Dry (12.03 x 2.35 x 2.39 m) - ISO 668</option>
-                                <option value="40hc">40 ft High Cube (12.03 x 2.35 x 2.69 m) - ISO 668</option>
-                                <option value="20hc">20 ft High Cube (5.90 x 2.35 x 2.69 m) - ISO 668</option>
+                                <option value="20ft">20 ft Dry (5.90 x 2.35 x 2.39 m) | 28,200 kg</option>
+                                <option value="40ft" selected>40 ft Dry (12.03 x 2.35 x 2.39 m) | 28,800 kg</option>
+                                <option value="20hc">20 ft High Cube (5.90 x 2.35 x 2.69 m) | 28,200 kg</option>
+                                <option value="40hc">40 ft High Cube (12.03 x 2.35 x 2.69 m) | 28,800 kg</option>
                             </select>
                         </div>
-                        <div class="form-group"><label>Proyecto</label><input type="text" id="projectName" placeholder="Nombre del proyecto"></div>
-                        <div class="form-group"><label>Cliente</label><input type="text" id="clientName" placeholder="Cliente / destino"></div>
+                        <div class="input-row">
+                            <div class="form-group"><label>Proyecto</label><input type="text" id="projectName" placeholder="Nombre del proyecto"></div>
+                            <div class="form-group"><label>Cliente</label><input type="text" id="clientName" placeholder="Cliente / destino"></div>
+                        </div>
                     </div>
                 </div>
+                
                 <div class="card">
                     <div class="card-header"><i class="fas fa-box"></i><h3>Agregar mercancía</h3></div>
                     <div class="card-body">
@@ -83,45 +169,59 @@
                         </div>
                         <div class="input-row">
                             <div class="form-group"><label>Peso (kg)</label><input type="number" id="itemWeight" value="50" step="10"></div>
-                            <div class="form-group"><label>Orientación</label><select id="itemOrientation"><option value="auto">Automática</option><option value="fixed">Fija</option></select></div>
+                            <div class="form-group"><label>Orientación</label><select id="itemOrientation"><option value="auto">Automática (optimizar)</option><option value="fixed">Fija</option></select></div>
                         </div>
                         <button id="addItemBtn" class="btn-success" style="width:100%"><i class="fas fa-plus"></i> Agregar producto</button>
                     </div>
                 </div>
+                
                 <div class="card">
-                    <div class="card-header"><i class="fas fa-chart-pie"></i><h3>Resumen de carga</h3></div>
+                    <div class="card-header"><i class="fas fa-chart-pie"></i><h3>Análisis de carga</h3></div>
                     <div class="card-body">
                         <div class="kpi-grid">
                             <div class="kpi-card"><div class="kpi-value" id="totalUnits">0</div><div class="kpi-label">Unidades</div></div>
-                            <div class="kpi-card"><div class="kpi-value" id="totalWeight">0</div><div class="kpi-label">Peso total (kg)</div></div>
+                            <div class="kpi-card"><div class="kpi-value" id="totalWeight">0</div><div class="kpi-label">Peso (kg)</div></div>
                             <div class="kpi-card"><div class="kpi-value" id="totalVolume">0</div><div class="kpi-label">Volumen (m³)</div></div>
                         </div>
                         <div class="kpi-grid">
                             <div class="kpi-card"><div class="kpi-value" id="occupancyRate">0%</div><div class="kpi-label">Ocupación</div></div>
                             <div class="kpi-card"><div class="kpi-value" id="weightLoad">0%</div><div class="kpi-label">Capacidad peso</div></div>
+                            <div class="kpi-card"><div class="kpi-value" id="containerDims">0x0x0</div><div class="kpi-label">Dimensiones (m)</div></div>
                         </div>
                         <div id="alertsContainer"></div>
-                        <button id="calculateBtn" class="btn-primary" style="width:100%; margin-top:15px"><i class="fas fa-calculator"></i> Calcular distribución</button>
+                        <div style="display:flex; gap:10px; margin-top:15px">
+                            <button id="calculateBtn" class="btn-primary" style="flex:1"><i class="fas fa-calculator"></i> Calcular</button>
+                            <button id="exportPdfBtn" class="btn-secondary" style="flex:1"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+                        </div>
                     </div>
                 </div>
             </div>
+            
+            <!-- Panel derecho: Visualización 3D -->
             <div>
                 <div class="plot-container">
-                    <div class="plot-header"><span><i class="fas fa-cube"></i> Visualización 3D del contenedor</span>
-                        <div><button id="resetViewBtn" class="btn-secondary" style="padding:4px 12px; margin-right:8px"><i class="fas fa-sync-alt"></i> Reset</button>
-                        <button id="exportReportBtn" class="btn-primary" style="padding:4px 12px"><i class="fas fa-download"></i> Exportar</button></div>
+                    <div class="plot-header">
+                        <span><i class="fas fa-cube"></i> Visualización 3D del contenedor</span>
+                        <div>
+                            <button id="resetViewBtn" class="btn-secondary" style="padding:4px 12px; margin-right:8px"><i class="fas fa-sync-alt"></i> Reset</button>
+                            <button id="screenshotBtn" class="btn-primary" style="padding:4px 12px"><i class="fas fa-camera"></i> Capturar</button>
+                        </div>
                     </div>
                     <div id="plot"></div>
                 </div>
+                
                 <div class="card" style="margin-top:20px">
                     <div class="card-header"><i class="fas fa-list"></i><h3>Productos cargados</h3><button id="clearAllBtn" class="btn-danger" style="padding:4px 12px"><i class="fas fa-trash"></i> Limpiar</button></div>
-                    <div class="card-body" style="max-height:250px; overflow-y:auto">
-                        <table class="items-table" id="itemsTable"><thead><tr><th>Producto</th><th>LxWxH (mm)</th><th>Cant</th><th>Peso</th><th></th></tr></thead><tbody id="itemsBody"><tr><td colspan="5" style="text-align:center">No hay productos cargados</td></tr></tbody></table>
+                    <div class="card-body" style="max-height:220px; overflow-y:auto; padding:0">
+                        <table class="items-table"><thead><tr><th>Producto</th><th>Dim (mm)</th><th>Cant</th><th>Peso</th><th></th></thead><tbody id="itemsBody"><tr><td colspan="5" style="text-align:center; padding:30px">No hay productos cargados</td></tr></tbody></table>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="module-footer"><i class="fas fa-chart-line"></i> Optimización por volumen | Estándar ISO 668 | Máximo peso: 28,800 kg</div>
+        
+        <div class="module-footer">
+            <i class="fas fa-chart-line"></i> Algoritmo de optimización 3D | Estándar ISO 668 | Máximo peso: 28,800 kg | Orientación automática
+        </div>
     </div>
     <script src="./script.js"></script>
 </body>
