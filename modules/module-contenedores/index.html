@@ -29,8 +29,9 @@
         .header-icon { font-size: 28px; background: rgba(255,255,255,0.12); width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
         .module-header h1 { font-size: 22px; font-weight: 600; color: white; margin-bottom: 4px; }
         .module-header p { font-size: 13px; color: rgba(255,255,255,0.7); }
-        .main-grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; }
-        .card { background: white; border-radius: 16px; border: 1px solid #E9ECEF; overflow: hidden; margin-bottom: 24px; }
+        .main-grid { display: grid; grid-template-columns: 400px 1fr; gap: 24px; }
+        .panel-left { display: flex; flex-direction: column; gap: 20px; }
+        .card { background: white; border-radius: 16px; border: 1px solid #E9ECEF; overflow: hidden; }
         .card-header { padding: 14px 20px; background: white; border-bottom: 1px solid #F0F2F5; display: flex; align-items: center; gap: 10px; }
         .card-header i { font-size: 18px; color: #E6163E; }
         .card-header h3 { font-size: 14px; font-weight: 600; color: #1A2C3E; flex: 1; }
@@ -73,6 +74,7 @@
         .btn-success { background: #059669; color: white; }
         .btn-success:hover { background: #047857; }
         .btn-danger { background: #FEF2F2; color: #DC2626; border: 1px solid #FEE2E2; }
+        .btn-danger:hover { background: #FEE2E2; }
         .items-table { width: 100%; border-collapse: collapse; font-size: 12px; }
         .items-table th { text-align: left; padding: 10px 8px; background: #F8FAFC; color: #5A6874; border-bottom: 1px solid #E9ECEF; }
         .items-table td { padding: 10px 8px; border-bottom: 1px solid #F1F5F9; }
@@ -101,7 +103,7 @@
         </div>
         
         <div class="main-grid">
-            <div>
+            <div class="panel-left">
                 <div class="card">
                     <div class="card-header"><i class="fas fa-ship"></i><h3>Contenedor ISO</h3></div>
                     <div class="card-body">
@@ -173,23 +175,6 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="card">
-                    <div class="card-header"><i class="fas fa-chart-line"></i><h3>Métricas de optimización</h3></div>
-                    <div class="card-body">
-                        <div class="kpi-grid">
-                            <div class="kpi-card"><div class="kpi-value" id="spaceEfficiency">0%</div><div class="kpi-label">Eficiencia espacial</div></div>
-                            <div class="kpi-card"><div class="kpi-value" id="stabilityIndex">100%</div><div class="kpi-label">Estabilidad</div></div>
-                            <div class="kpi-card"><div class="kpi-value" id="centerGravity">0,0,0</div><div class="kpi-label">Centro de gravedad</div></div>
-                        </div>
-                        <div class="kpi-grid">
-                            <div class="kpi-card"><div class="kpi-value" id="axleLoadFront">0 kg</div><div class="kpi-label">Eje delantero</div></div>
-                            <div class="kpi-card"><div class="kpi-value" id="axleLoadRear">0 kg</div><div class="kpi-label">Eje trasero</div></div>
-                            <div class="kpi-card"><div class="kpi-value" id="lashingPoints">0</div><div class="kpi-label">Puntos de amarre</div></div>
-                        </div>
-                        <div id="loadingSequenceContainer" style="margin-top:12px; font-size:11px; color:#5A6874;"></div>
-                    </div>
-                </div>
             </div>
             
             <div>
@@ -207,7 +192,7 @@
                 <div class="card" style="margin-top:20px">
                     <div class="card-header"><i class="fas fa-list"></i><h3>Productos cargados</h3><button id="clearAllBtn" class="btn-danger" style="padding:4px 12px"><i class="fas fa-trash"></i> Limpiar</button></div>
                     <div class="card-body" style="max-height:220px; overflow-y:auto; padding:0">
-                        <table class="items-table"><thead><tr><th>Producto</th><th>Dim (mm)</th><th>Cant</th><th>Peso</th><th></th></tr></thead><tbody id="itemsBody"><tr><td colspan="5" style="text-align:center; padding:30px">No hay productos cargados</td></tr></tbody></table>
+                        <table class="items-table"><thead>(\n<th>Producto</th><th>Dim (mm)</th><th>Cant</th><th>Peso</th><th></th>(\n</thead><tbody id="itemsBody">(\n<td colspan="5" style="text-align:center; padding:30px">No hay productos cargados(\n</tbody>(\n</table>
                     </div>
                 </div>
             </div>
