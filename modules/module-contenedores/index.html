@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XIM - Container Load Planner 3D</title>
+    <title>XIM - Container Load Planner</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -17,8 +17,6 @@
             padding: 20px;
         }
         .container-module { max-width: 1600px; margin: 0 auto; }
-        
-        /* Header XIM */
         .module-header {
             background: #043C7C;
             padding: 20px 25px;
@@ -27,37 +25,16 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .header-icon { font-size: 28px; background: rgba(255,255,255,0.12); width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
         .module-header h1 { font-size: 22px; font-weight: 600; color: white; margin-bottom: 4px; }
         .module-header p { font-size: 13px; color: rgba(255,255,255,0.7); }
-        
-        /* Grid */
-        .main-grid { display: grid; grid-template-columns: 360px 1fr; gap: 24px; }
-        
-        /* Cards */
-        .card {
-            background: white;
-            border-radius: 16px;
-            border: 1px solid #E9ECEF;
-            overflow: hidden;
-            margin-bottom: 24px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-        }
-        .card-header {
-            padding: 14px 20px;
-            background: white;
-            border-bottom: 1px solid #F0F2F5;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .main-grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; }
+        .card { background: white; border-radius: 16px; border: 1px solid #E9ECEF; overflow: hidden; margin-bottom: 24px; }
+        .card-header { padding: 14px 20px; background: white; border-bottom: 1px solid #F0F2F5; display: flex; align-items: center; gap: 10px; }
         .card-header i { font-size: 18px; color: #E6163E; }
         .card-header h3 { font-size: 14px; font-weight: 600; color: #1A2C3E; flex: 1; }
         .card-body { padding: 20px; }
-        
-        /* Formulario */
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 12px; font-weight: 500; color: #5A6874; margin-bottom: 6px; }
         .form-group input, .form-group select {
@@ -75,8 +52,6 @@
             box-shadow: 0 0 0 3px rgba(230,22,62,0.08);
         }
         .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        
-        /* Botones */
         .btn-primary, .btn-secondary, .btn-success, .btn-danger {
             border: none;
             border-radius: 10px;
@@ -98,30 +73,20 @@
         .btn-success { background: #059669; color: white; }
         .btn-success:hover { background: #047857; }
         .btn-danger { background: #FEF2F2; color: #DC2626; border: 1px solid #FEE2E2; }
-        
-        /* Tabla items */
         .items-table { width: 100%; border-collapse: collapse; font-size: 12px; }
         .items-table th { text-align: left; padding: 10px 8px; background: #F8FAFC; color: #5A6874; border-bottom: 1px solid #E9ECEF; }
         .items-table td { padding: 10px 8px; border-bottom: 1px solid #F1F5F9; }
-        
-        /* KPIs */
         .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 15px; }
         .kpi-card { background: #F8FAFC; border-radius: 14px; padding: 12px; text-align: center; border: 1px solid #F0F2F5; }
         .kpi-value { font-size: 26px; font-weight: 700; color: #E6163E; }
         .kpi-label { font-size: 11px; color: #7E8C9A; margin-top: 4px; }
-        
-        /* Plot 3D */
         .plot-container { background: white; border-radius: 16px; border: 1px solid #E9ECEF; overflow: hidden; }
         .plot-header { padding: 12px 16px; background: white; border-bottom: 1px solid #F0F2F5; display: flex; justify-content: space-between; align-items: center; }
         #plot { width: 100%; height: 550px; }
-        
-        /* Alertas */
         .alert { padding: 12px; border-radius: 12px; margin-top: 12px; font-size: 12px; display: flex; align-items: center; gap: 8px; }
         .alert-warning { background: #FFFBEB; color: #B45309; border-left: 3px solid #F59E0B; }
         .alert-success { background: #ECFDF5; color: #065F46; border-left: 3px solid #10B981; }
-        
         .module-footer { margin-top: 24px; padding: 12px 20px; background: white; border-radius: 14px; font-size: 11px; color: #7E8C9A; text-align: center; border: 1px solid #E9ECEF; }
-        
         @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -130,13 +95,12 @@
         <div class="module-header">
             <div class="header-icon"><i class="fas fa-cubes"></i></div>
             <div>
-                <h1>Container Load Planner 3D</h1>
-                <p>Planificación de carga | Estándares ISO 668 | Visualización 3D interactiva</p>
+                <h1>Container Load Planner</h1>
+                <p>Planificación de carga | Algoritmo 3D | Estándares ISO 668</p>
             </div>
         </div>
         
         <div class="main-grid">
-            <!-- Panel izquierdo -->
             <div>
                 <div class="card">
                     <div class="card-header"><i class="fas fa-ship"></i><h3>Contenedor ISO</h3></div>
@@ -160,7 +124,7 @@
                 <div class="card">
                     <div class="card-header"><i class="fas fa-box"></i><h3>Agregar mercancía</h3></div>
                     <div class="card-body">
-                        <div class="form-group"><label>Producto</label><input type="text" id="productName" placeholder="Ej: Servidor, Batería, Pallet"></div>
+                        <div class="form-group"><label>Producto</label><input type="text" id="productName" placeholder="Nombre del producto"></div>
                         <div class="input-row">
                             <div class="form-group"><label>Largo (mm)</label><input type="number" id="itemL" value="600" step="10"></div>
                             <div class="form-group"><label>Ancho (mm)</label><input type="number" id="itemW" value="400" step="10"></div>
@@ -168,8 +132,22 @@
                             <div class="form-group"><label>Cantidad</label><input type="number" id="itemQty" value="1" min="1"></div>
                         </div>
                         <div class="input-row">
-                            <div class="form-group"><label>Peso (kg)</label><input type="number" id="itemWeight" value="50" step="10"></div>
-                            <div class="form-group"><label>Orientación</label><select id="itemOrientation"><option value="auto">Automática (optimizar)</option><option value="fixed">Fija</option></select></div>
+                            <div class="form-group"><label>Peso unitario (kg)</label><input type="number" id="itemWeight" value="50" step="10"></div>
+                            <div class="form-group"><label>Tipo de carga</label>
+                                <select id="itemCargoType">
+                                    <option value="standard">Estándar</option>
+                                    <option value="fragile">Frágil</option>
+                                    <option value="heavy">Pesado</option>
+                                    <option value="pallet">Pallet</option>
+                                    <option value="liquid">Líquido</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group"><label>Orientación</label>
+                            <select id="itemOrientation">
+                                <option value="auto">Automática (optimizar)</option>
+                                <option value="fixed">Fija</option>
+                            </select>
                         </div>
                         <button id="addItemBtn" class="btn-success" style="width:100%"><i class="fas fa-plus"></i> Agregar producto</button>
                     </div>
@@ -195,9 +173,25 @@
                         </div>
                     </div>
                 </div>
+                
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-chart-line"></i><h3>Métricas de optimización</h3></div>
+                    <div class="card-body">
+                        <div class="kpi-grid">
+                            <div class="kpi-card"><div class="kpi-value" id="spaceEfficiency">0%</div><div class="kpi-label">Eficiencia espacial</div></div>
+                            <div class="kpi-card"><div class="kpi-value" id="stabilityIndex">100%</div><div class="kpi-label">Estabilidad</div></div>
+                            <div class="kpi-card"><div class="kpi-value" id="centerGravity">0,0,0</div><div class="kpi-label">Centro de gravedad</div></div>
+                        </div>
+                        <div class="kpi-grid">
+                            <div class="kpi-card"><div class="kpi-value" id="axleLoadFront">0 kg</div><div class="kpi-label">Eje delantero</div></div>
+                            <div class="kpi-card"><div class="kpi-value" id="axleLoadRear">0 kg</div><div class="kpi-label">Eje trasero</div></div>
+                            <div class="kpi-card"><div class="kpi-value" id="lashingPoints">0</div><div class="kpi-label">Puntos de amarre</div></div>
+                        </div>
+                        <div id="loadingSequenceContainer" style="margin-top:12px; font-size:11px; color:#5A6874;"></div>
+                    </div>
+                </div>
             </div>
             
-            <!-- Panel derecho: Visualización 3D -->
             <div>
                 <div class="plot-container">
                     <div class="plot-header">
@@ -213,14 +207,14 @@
                 <div class="card" style="margin-top:20px">
                     <div class="card-header"><i class="fas fa-list"></i><h3>Productos cargados</h3><button id="clearAllBtn" class="btn-danger" style="padding:4px 12px"><i class="fas fa-trash"></i> Limpiar</button></div>
                     <div class="card-body" style="max-height:220px; overflow-y:auto; padding:0">
-                        <table class="items-table"><thead><tr><th>Producto</th><th>Dim (mm)</th><th>Cant</th><th>Peso</th><th></th></thead><tbody id="itemsBody"><tr><td colspan="5" style="text-align:center; padding:30px">No hay productos cargados</td></tr></tbody></table>
+                        <table class="items-table"><thead><tr><th>Producto</th><th>Dim (mm)</th><th>Cant</th><th>Peso</th><th></th></tr></thead><tbody id="itemsBody"><tr><td colspan="5" style="text-align:center; padding:30px">No hay productos cargados</td></tr></tbody></table>
                     </div>
                 </div>
             </div>
         </div>
         
         <div class="module-footer">
-            <i class="fas fa-chart-line"></i> Algoritmo de optimización 3D | Estándar ISO 668 | Máximo peso: 28,800 kg | Orientación automática
+            <i class="fas fa-chart-line"></i> Algoritmo 3D Bin Packing | Centro de gravedad | Estabilidad | ISO 668
         </div>
     </div>
     <script src="./script.js"></script>
