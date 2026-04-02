@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XIM POWER - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #F1F5F9; }
+        .header {
+            background: #043C7C;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo i { font-size: 28px; }
+        .logo h1 { font-size: 20px; }
+        .user-menu { display: flex; align-items: center; gap: 20px; }
+        .user-name { font-weight: 600; font-size: 14px; }
+        .user-role { font-size: 11px; opacity: 0.8; }
+        .logout-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+        .nav {
+            background: white;
+            padding: 0 30px;
+            border-bottom: 1px solid #E2E8F0;
+            display: flex;
+            gap: 20px;
+        }
+        .nav-btn {
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #5A6874;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-btn:hover { color: #E6163E; }
+        .nav-btn.active { color: #E6163E; border-bottom-color: #E6163E; }
+        .content { padding: 30px; max-width: 1400px; margin: 0 auto; }
+        .module-pane { display: none; }
+        .module-pane.active { display: block; }
+        iframe { width: 100%; height: calc(100vh - 180px); border: none; border-radius: 16px; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 16px; border: 1px solid #E2E8F0; }
+        .stat-card i { font-size: 28px; color: #E6163E; margin-bottom: 10px; }
+        .stat-card h3 { font-size: 28px; font-weight: 700; margin: 10px 0; }
+        .stat-card p { font-size: 13px; color: #7E8C9A; }
+        .activity-list { background: white; border-radius: 16px; border: 1px solid #E2E8F0; overflow: hidden; }
+        .activity-header { padding: 15px 20px; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; font-weight: 600; }
+        .activity-item { padding: 12px 20px; border-bottom: 1px solid #F1F5F9; display: flex; justify-content: space-between; font-size: 13px; }
+        @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo"><i class="fas fa-cubes"></i><h1>XIM POWER SYSTEM</h1></div>
+        <div class="user-menu">
+            <div><div class="user-name" id="userName"></div><div class="user-role" id="userRole"></div></div>
+            <button class="logout-btn" id="logoutBtn">Salir</button>
+        </div>
+    </div>
+    <div class="nav">
+        <button class="nav-btn active" data-module="dashboard">Dashboard</button>
+        <button class="nav-btn" data-module="fichas">Fichas Técnicas</button>
+        <button class="nav-btn" data-module="contenedores">Contenedores 3D</button>
+        <button class="nav-btn" data-module="datacenter">Data Center</button>
+        <button class="nav-btn" data-module="analytics">Analítica</button>
+    </div>
+    <div class="content">
+        <div id="module-dashboard" class="module-pane active">
+            <div class="stats-grid" id="statsGrid"></div>
+            <div class="activity-list"><div class="activity-header">Actividad reciente</div><div id="activityList"></div></div>
+        </div>
+        <div id="module-fichas" class="module-pane"><iframe src="modules/module-fichas/index.html"></iframe></div>
+        <div id="module-contenedores" class="module-pane"><iframe src="modules/module-contenedores/index.html"></iframe></div>
+        <div id="module-datacenter" class="module-pane"><iframe src="modules/module-datacenter/index.html"></iframe></div>
+        <div id="module-analytics" class="module-pane">
+            <div class="stats-grid" id="analyticsStats"></div>
+            <div class="activity-list"><div class="activity-header">Estadísticas de uso</div><div id="analyticsList"></div></div>
+        </div>
+    </div>
+    <script>
+        const session = JSON.parse(localStorage.getItem('xim_session'));
+        if (!session) window.location.href = 'index.html';
+        document.getElementById('userName').textContent = session.name;
+        document.getElementById('userRole').textContent = session.role === 'admin' ? 'Administrador' : session.role === 'editor' ? 'Editor' : 'Visualizador';
+        let analytics = JSON.parse(localStorage.getItem('xim_analytics')) || [];
+        const userAnalytics = analytics.filter(a => a.user === session.username);
+        const moduleUsage = {};
+        userAnalytics.forEach(a => { if (a.module) moduleUsage[a.module] = (moduleUsage[a.module] || 0) + 1; });
+        document.getElementById('statsGrid').innerHTML = `
+            <div class="stat-card"><i class="fas fa-calendar"></i><h3>${new Date().toLocaleDateString()}</h3><p>Último acceso</p></div>
+            <div class="stat-card"><i class="fas fa-chart-line"></i><h3>${userAnalytics.length}</h3><p>Actividades totales</p></div>
+            <div class="stat-card"><i class="fas fa-cubes"></i><h3>${moduleUsage['contenedores'] || 0}</h3><p>Simulaciones 3D</p></div>
+            <div class="stat-card"><i class="fas fa-file-alt"></i><h3>${moduleUsage['fichas'] || 0}</h3><p>Fichas procesadas</p></div>
+        `;
+        const recentActivity = [...userAnalytics].reverse().slice(0, 10);
+        document.getElementById('activityList').innerHTML = recentActivity.map(a => `<div class="activity-item"><span>${a.action === 'login' ? 'Inicio de sesión' : a.action === 'view_module' ? `Vista a ${a.module}` : `Procesó ${a.module}`}</span><span>${new Date(a.timestamp).toLocaleString()}</span></div>`).join('') || '<div class="activity-item">No hay actividad</div>';
+        const allUsers = JSON.parse(localStorage.getItem('xim_users')) || {};
+        const totalUsers = Object.keys(allUsers).length;
+        const totalLogins = analytics.filter(a => a.action === 'login').length;
+        document.getElementById('analyticsStats').innerHTML = `
+            <div class="stat-card"><i class="fas fa-users"></i><h3>${totalUsers}</h3><p>Usuarios registrados</p></div>
+            <div class="stat-card"><i class="fas fa-sign-in-alt"></i><h3>${totalLogins}</h3><p>Inicios de sesión</p></div>
+            <div class="stat-card"><i class="fas fa-chart-bar"></i><h3>${analytics.length}</h3><p>Eventos totales</p></div>
+        `;
+        const moduleStats = {};
+        analytics.forEach(a => { if (a.module) moduleStats[a.module] = (moduleStats[a.module] || 0) + 1; });
+        document.getElementById('analyticsList').innerHTML = Object.entries(moduleStats).map(([mod, count]) => `<div class="activity-item"><span>${mod === 'fichas' ? 'Fichas Técnicas' : mod === 'contenedores' ? 'Contenedores 3D' : 'Data Center'}</span><span>${count} visitas</span></div>`).join('') || '<div class="activity-item">No hay datos</div>';
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const module = btn.dataset.module;
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.module-pane').forEach(pane => pane.classList.remove('active'));
+                document.getElementById(`module-${module}`).classList.add('active');
+                if (module !== 'dashboard' && module !== 'analytics') {
+                    analytics.push({ user: session.username, action: 'view_module', module: module, timestamp: new Date().toISOString() });
+                    localStorage.setItem('xim_analytics', JSON.stringify(analytics));
+                }
+            });
+        });
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            analytics.push({ user: session.username, action: 'logout', timestamp: new Date().toISOString() });
+            localStorage.setItem('xim_analytics', JSON.stringify(analytics));
+            localStorage.removeItem('xim_session');
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>
