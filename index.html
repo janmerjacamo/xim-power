@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XIM POWER - Portal de Usuarios</title>
+    <title>XIM POWER - Acceso</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -17,8 +17,8 @@
             justify-content: center;
             padding: 20px;
         }
-        .login-container {
-            max-width: 450px;
+        .login-card {
+            max-width: 400px;
             width: 100%;
             background: white;
             border-radius: 24px;
@@ -33,10 +33,9 @@
         }
         .login-header i { font-size: 48px; margin-bottom: 15px; }
         .login-header h1 { font-size: 24px; margin-bottom: 5px; }
-        .login-header p { font-size: 13px; opacity: 0.8; }
         .login-body { padding: 30px; }
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 12px; font-weight: 500; color: #5A6874; margin-bottom: 8px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; color: #5A6874; margin-bottom: 8px; }
         .form-group input {
             width: 100%;
             padding: 12px 15px;
@@ -45,7 +44,6 @@
             font-family: 'Inter', sans-serif;
             font-size: 14px;
         }
-        .form-group input:focus { outline: none; border-color: #E6163E; box-shadow: 0 0 0 3px rgba(230,22,62,0.1); }
         .btn-login {
             width: 100%;
             padding: 12px;
@@ -55,17 +53,13 @@
             border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
+            font-size: 15px;
         }
         .btn-login:hover { background: #c41236; }
-        .register-link { text-align: center; margin-top: 20px; font-size: 13px; color: #7E8C9A; }
-        .register-link a { color: #E6163E; text-decoration: none; font-weight: 500; }
-        .alert { padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; display: flex; align-items: center; gap: 10px; }
-        .alert-error { background: #FEF2F2; color: #DC2626; border-left: 3px solid #DC2626; }
-        .alert-success { background: #ECFDF5; color: #065F46; border-left: 3px solid #10B981; }
+        .alert { padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; background: #FEF2F2; color: #DC2626; border-left: 3px solid #DC2626; }
         .demo-info {
             margin-top: 20px;
-            padding: 15px;
+            padding: 12px;
             background: #F8FAFC;
             border-radius: 12px;
             font-size: 12px;
@@ -75,11 +69,11 @@
     </style>
 </head>
 <body>
-    <div class="login-container">
+    <div class="login-card">
         <div class="login-header">
             <i class="fas fa-cubes"></i>
-            <h1>XIM POWER SYSTEM</h1>
-            <p>Portal de usuarios</p>
+            <h1>XIM POWER</h1>
+            <p>Acceso al sistema</p>
         </div>
         <div class="login-body">
             <div id="alertMsg"></div>
@@ -92,60 +86,44 @@
                     <label>Contraseña</label>
                     <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
                 </div>
-                <button type="submit" class="btn-login">Iniciar sesión</button>
+                <button type="submit" class="btn-login">Ingresar</button>
             </form>
-            <div class="register-link">
-                ¿No tienes cuenta? <a href="#" id="showRegister">Regístrate aquí</a>
-            </div>
             <div class="demo-info">
-                Usuarios demo:<br>
-                admin / admin123 | editor / editor123 | viewer / viewer123
+                <i class="fas fa-info-circle"></i> Contacta al administrador para obtener tus credenciales
             </div>
         </div>
     </div>
     <script>
         let users = JSON.parse(localStorage.getItem('xim_users')) || {
-            'admin': { password: 'admin123', name: 'Administrador', role: 'admin', email: 'admin@ximpower.com', createdAt: new Date().toISOString() },
-            'editor': { password: 'editor123', name: 'Editor', role: 'editor', email: 'editor@ximpower.com', createdAt: new Date().toISOString() },
-            'viewer': { password: 'viewer123', name: 'Visualizador', role: 'viewer', email: 'viewer@ximpower.com', createdAt: new Date().toISOString() }
+            'admin': { password: 'xim2024', name: 'Administrador', role: 'admin', email: 'admin@ximpower.com' },
+            'juan': { password: 'juan123', name: 'Juan Pérez', role: 'editor', email: 'juan@ximpower.com' },
+            'maria': { password: 'maria123', name: 'María García', role: 'viewer', email: 'maria@ximpower.com' }
         };
         localStorage.setItem('xim_users', JSON.stringify(users));
-        function showAlert(message, type) {
-            const alertDiv = document.getElementById('alertMsg');
-            alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
-            setTimeout(() => { alertDiv.innerHTML = ''; }, 4000);
+        
+        function showAlert(msg) {
+            document.getElementById('alertMsg').innerHTML = `<div class="alert">${msg}</div>`;
+            setTimeout(() => { document.getElementById('alertMsg').innerHTML = ''; }, 3000);
         }
+        
         document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             const user = users[username];
+            
             if (user && user.password === password) {
-                const session = { username, name: user.name, role: user.role, email: user.email, loginTime: new Date().toISOString() };
+                const session = { username, name: user.name, role: user.role, email: user.email };
                 localStorage.setItem('xim_session', JSON.stringify(session));
-                let analytics = JSON.parse(localStorage.getItem('xim_analytics')) || [];
-                analytics.push({ user: username, action: 'login', timestamp: new Date().toISOString() });
-                localStorage.setItem('xim_analytics', JSON.stringify(analytics));
-                showAlert('Inicio exitoso. Redirigiendo...', 'success');
-                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+                window.location.href = 'dashboard.html';
             } else {
-                showAlert('Usuario o contraseña incorrectos', 'error');
+                showAlert('Usuario o contraseña incorrectos');
             }
         });
-        document.getElementById('showRegister').addEventListener('click', (e) => {
-            e.preventDefault();
-            const username = prompt('Nombre de usuario:');
-            if (!username) return;
-            const password = prompt('Contraseña:');
-            if (!password) return;
-            const name = prompt('Nombre completo:');
-            if (users[username]) { showAlert('Usuario ya existe', 'error'); return; }
-            users[username] = { password, name, role: 'viewer', email: '', createdAt: new Date().toISOString() };
-            localStorage.setItem('xim_users', JSON.stringify(users));
-            showAlert('Usuario registrado. Ya puedes iniciar sesión.', 'success');
-        });
-        const session = JSON.parse(localStorage.getItem('xim_session'));
-        if (session) window.location.href = 'dashboard.html';
+        
+        if (localStorage.getItem('xim_session')) {
+            window.location.href = 'dashboard.html';
+        }
     </script>
 </body>
 </html>

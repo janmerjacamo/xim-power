@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XIM POWER - Administración</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #F1F5F9; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header {
+            background: #043C7C;
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card { background: white; border-radius: 16px; border: 1px solid #E2E8F0; overflow: hidden; margin-bottom: 20px; }
+        .card-header { padding: 15px 20px; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; font-weight: 600; }
+        .card-body { padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #E2E8F0; }
+        th { background: #F8FAFC; font-weight: 600; }
+        .btn-add { background: #059669; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+        .btn-delete { background: #FEF2F2; color: #DC2626; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; }
+        .btn-back { background: #1E293B; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 350px;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+        }
+        .modal-content button { margin-top: 10px; width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2><i class="fas fa-users"></i> Administración de Usuarios</h2>
+            <button class="btn-back" onclick="location.href='dashboard.html'"><i class="fas fa-arrow-left"></i> Volver</button>
+        </div>
+        <div class="card">
+            <div class="card-header">Usuarios registrados</div>
+            <div class="card-body">
+                <button class="btn-add" id="addUserBtn"><i class="fas fa-plus"></i> Nuevo usuario</button>
+                <table style="margin-top: 15px;">
+                    <thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Email</th><th></th></thead>
+                    <tbody id="usersTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h3>Nuevo usuario</h3>
+            <input type="text" id="newUsername" placeholder="Usuario">
+            <input type="password" id="newPassword" placeholder="Contraseña">
+            <input type="text" id="newName" placeholder="Nombre completo">
+            <input type="email" id="newEmail" placeholder="Email">
+            <select id="newRole" style="width:100%; padding:10px; margin:10px 0;">
+                <option value="viewer">Visualizador</option>
+                <option value="editor">Editor</option>
+                <option value="admin">Administrador</option>
+            </select>
+            <button id="saveUserBtn" class="btn-add">Guardar</button>
+            <button id="closeModalBtn" style="background:#E2E8F0; margin-top:5px;">Cancelar</button>
+        </div>
+    </div>
+    <script>
+        const session = JSON.parse(localStorage.getItem('xim_session'));
+        if (!session || session.role !== 'admin') {
+            alert('Acceso denegado. Solo administradores.');
+            window.location.href = 'dashboard.html';
+        }
+        
+        function loadUsers() {
+            const users = JSON.parse(localStorage.getItem('xim_users')) || {};
+            const tbody = document.getElementById('usersTable');
+            tbody.innerHTML = Object.entries(users).map(([username, user]) => `
+                <tr>
+                    <td>${username}</td>
+                    <td>${user.name}</td>
+                    <td>${user.role === 'admin' ? 'Administrador' : user.role === 'editor' ? 'Editor' : 'Visualizador'}</td>
+                    <td>${user.email || '-'}</td>
+                    <td><button class="btn-delete" onclick="deleteUser('${username}')">Eliminar</button></td>
+                </tr>
+            `).join('');
+        }
+        
+        function deleteUser(username) {
+            if (username === 'admin') { alert('No se puede eliminar el usuario admin'); return; }
+            if (confirm(`¿Eliminar a ${username}?`)) {
+                let users = JSON.parse(localStorage.getItem('xim_users')) || {};
+                delete users[username];
+                localStorage.setItem('xim_users', JSON.stringify(users));
+                loadUsers();
+            }
+        }
+        
+        document.getElementById('addUserBtn').onclick = () => {
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('newName').value = '';
+            document.getElementById('newEmail').value = '';
+        };
+        
+        document.getElementById('closeModalBtn').onclick = () => {
+            document.getElementById('modal').style.display = 'none';
+        };
+        
+        document.getElementById('saveUserBtn').onclick = () => {
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value;
+            const name = document.getElementById('newName').value.trim();
+            const email = document.getElementById('newEmail').value.trim();
+            const role = document.getElementById('newRole').value;
+            
+            if (!username || !password || !name) { alert('Complete todos los campos'); return; }
+            
+            let users = JSON.parse(localStorage.getItem('xim_users')) || {};
+            if (users[username]) { alert('El usuario ya existe'); return; }
+            
+            users[username] = { password, name, role, email };
+            localStorage.setItem('xim_users', JSON.stringify(users));
+            document.getElementById('modal').style.display = 'none';
+            loadUsers();
+        };
+        
+        loadUsers();
+    </script>
+</body>
+</html>
